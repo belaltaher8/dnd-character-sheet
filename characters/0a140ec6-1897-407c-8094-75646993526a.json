@@ -1,0 +1,69 @@
+{
+  "id": "0a140ec6-1897-407c-8094-75646993526a",
+  "name": "Karlton \"Phil\" Marixmus",
+  "class": "Artificer",
+  "subclass": "Battle Smith",
+  "species": "Aasimar",
+  "background": "Sage",
+  "level": 8,
+  "xp": 0,
+  "armorClass": 17,
+  "shield": 0,
+  "hpCurrent": 0,
+  "hpTemp": 0,
+  "hpLevel1": 8,
+  "hpPerLevel": 5,
+  "hitDiceSpent": 0,
+  "deathSaves": {
+    "successes": 0,
+    "failures": 0
+  },
+  "speed": "30 ft",
+  "size": "Medium",
+  "heroicInspiration": false,
+  "proficiencyBonus": 3,
+  "abilities": {
+    "strength": 10,
+    "dexterity": 11,
+    "constitution": 14,
+    "intelligence": 18,
+    "wisdom": 11,
+    "charisma": 10
+  },
+  "saveProficiencies": {
+    "strength": false,
+    "dexterity": false,
+    "constitution": true,
+    "intelligence": true,
+    "wisdom": false,
+    "charisma": false
+  },
+  "skillProficiencies": {
+    "athletics": false,
+    "acrobatics": false,
+    "sleight-of-hand": false,
+    "stealth": false,
+    "arcana": true,
+    "history": true,
+    "investigation": true,
+    "nature": false,
+    "religion": false,
+    "animal-handling": false,
+    "insight": false,
+    "medicine": false,
+    "perception": true,
+    "survival": false,
+    "deception": false,
+    "intimidation": false,
+    "performance": false,
+    "persuasion": false
+  },
+  "armorTraining": {
+    "light": true,
+    "medium": true,
+    "heavy": false,
+    "shields": true
+  },
+  "weaponProficiencies": "Simple (Artificer), Firearms (Artificer), Martial (BattleSmith)",
+  "toolProficiencies": "Smith's (BattleSmith), Tinker's (Artificer). Woodcarver (Artificer), Thieves (Artificer), Calligrapher's (Sage)"
+}

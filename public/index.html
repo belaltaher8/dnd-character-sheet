@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D&D Character Sheet</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar with character list -->
+    <aside id="sidebar">
+      <h2>Characters</h2>
+      <ul id="character-list"></ul>
+      <button id="new-character-btn" class="btn primary">+ New Character</button>
+    </aside>
+
+    <!-- Main character sheet -->
+    <main id="sheet">
+      <div id="no-character">
+        <p>Select a character or create a new one</p>
+      </div>
+
+      <div id="character-sheet" class="hidden">
+        <!-- Header Section -->
+        <header class="sheet-header">
+          <div class="header-left">
+            <div class="name-field">
+              <input type="text" id="char-name" placeholder="Character Name">
+              <label>Character Name</label>
+            </div>
+            <div class="header-details">
+              <div class="detail-field">
+                <input type="text" id="char-background" placeholder="Background">
+                <label>Background</label>
+              </div>
+              <div class="detail-field">
+                <input type="text" id="char-class" placeholder="Class">
+                <label>Class</label>
+              </div>
+              <div class="detail-field">
+                <input type="text" id="char-species" placeholder="Species">
+                <label>Species</label>
+              </div>
+              <div class="detail-field">
+                <input type="text" id="char-subclass" placeholder="Subclass">
+                <label>Subclass</label>
+              </div>
+            </div>
+          </div>
+          <div class="header-right">
+            <div class="level-xp-group">
+              <div class="level-box">
+                <input type="number" id="char-level" value="1" min="1" max="20">
+                <label>Level</label>
+              </div>
+              <div class="xp-box">
+                <input type="number" id="char-xp" value="0" min="0">
+                <label>XP</label>
+              </div>
+            </div>
+            <div class="ac-shield-group">
+              <div class="armor-class-box">
+                <input type="number" id="armor-class" value="10" min="0">
+                <label>Armor Class</label>
+              </div>
+              <div class="shield-box">
+                <input type="number" id="shield" value="0" min="0">
+                <label>Shield</label>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Combat Stats Row -->
+        <section class="combat-row">
+          <div class="hp-section">
+            <div class="hp-header">Hit Points</div>
+            <div class="hp-inputs">
+              <div class="hp-field">
+                <input type="number" id="hp-current" value="0" min="0">
+                <label>Current</label>
+              </div>
+              <div class="hp-field">
+                <input type="number" id="hp-max" value="0" min="0" readonly>
+                <label>Max</label>
+              </div>
+              <div class="hp-field">
+                <input type="number" id="hp-temp" value="0" min="0">
+                <label>Temp</label>
+              </div>
+            </div>
+            <div class="hp-formula">
+              <div class="hp-formula-field">
+                <input type="number" id="hp-level1" value="0" min="0">
+                <label>Lvl 1 HP</label>
+              </div>
+              <div class="hp-formula-field">
+                <input type="number" id="hp-per-level" value="0" min="0">
+                <label>Per Lvl</label>
+              </div>
+            </div>
+          </div>
+          <div class="hit-dice-section">
+            <div class="section-header">Hit Dice</div>
+            <div class="hit-dice-inputs">
+              <div class="hit-dice-field">
+                <input type="number" id="hit-dice-spent" value="0" min="0">
+                <label>Spent</label>
+              </div>
+              <div class="hit-dice-field">
+                <input type="number" id="hit-dice-max" value="1" min="1" readonly>
+                <label>Max</label>
+              </div>
+            </div>
+          </div>
+          <div class="death-saves-section">
+            <div class="section-header">Death Saves</div>
+            <div class="death-saves">
+              <div class="success-saves">
+                <label>Successes</label>
+                <div class="save-circles">
+                  <input type="checkbox" id="death-success-1">
+                  <input type="checkbox" id="death-success-2">
+                  <input type="checkbox" id="death-success-3">
+                </div>
+              </div>
+              <div class="failure-saves">
+                <label>Failures</label>
+                <div class="save-circles">
+                  <input type="checkbox" id="death-fail-1">
+                  <input type="checkbox" id="death-fail-2">
+                  <input type="checkbox" id="death-fail-3">
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+          <!-- Left Column: Stats -->
+          <div class="left-column">
+            <!-- Proficiency Bonus -->
+            <div class="proficiency-box">
+              <input type="number" id="proficiency-bonus" value="2" min="1" max="6">
+              <label>Proficiency Bonus</label>
+            </div>
+
+            <!-- Ability Scores with Saving Throws and Skills -->
+            <div class="abilities-column">
+              <!-- Strength -->
+              <div class="ability-block" data-ability="strength">
+                <div class="ability-header">Strength</div>
+                <div class="ability-main">
+                  <span class="modifier" id="str-mod">+0</span>
+                  <input type="number" class="score-input" id="str-score" value="10" min="1" max="30">
+                </div>
+                <div class="saving-throw">
+                  <input type="checkbox" id="str-save-prof">
+                  <span class="save-value" id="str-save">+0</span>
+                  <label>Saving Throw</label>
+                </div>
+                <div class="skills-list">
+                  <div class="skill-row">
+                    <input type="checkbox" id="athletics-prof">
+                    <span class="skill-value" id="athletics-val">+0</span>
+                    <label>Athletics</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dexterity -->
+              <div class="ability-block" data-ability="dexterity">
+                <div class="ability-header">Dexterity</div>
+                <div class="ability-main">
+                  <span class="modifier" id="dex-mod">+0</span>
+                  <input type="number" class="score-input" id="dex-score" value="10" min="1" max="30">
+                </div>
+                <div class="saving-throw">
+                  <input type="checkbox" id="dex-save-prof">
+                  <span class="save-value" id="dex-save">+0</span>
+                  <label>Saving Throw</label>
+                </div>
+                <div class="skills-list">
+                  <div class="skill-row">
+                    <input type="checkbox" id="acrobatics-prof">
+                    <span class="skill-value" id="acrobatics-val">+0</span>
+                    <label>Acrobatics</label>
+                  </div>
+                  <div class="skill-row">
+                    <input type="checkbox" id="sleight-of-hand-prof">
+                    <span class="skill-value" id="sleight-of-hand-val">+0</span>
+                    <label>Sleight of Hand</label>
+                  </div>
+                  <div class="skill-row">
+                    <input type="checkbox" id="stealth-prof">
+                    <span class="skill-value" id="stealth-val">+0</span>
+                    <label>Stealth</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Constitution -->
+              <div class="ability-block" data-ability="constitution">
+                <div class="ability-header">Constitution</div>
+                <div class="ability-main">
+                  <span class="modifier" id="con-mod">+0</span>
+                  <input type="number" class="score-input" id="con-score" value="10" min="1" max="30">
+                </div>
+                <div class="saving-throw">
+                  <input type="checkbox" id="con-save-prof">
+                  <span class="save-value" id="con-save">+0</span>
+                  <label>Saving Throw</label>
+                </div>
+              </div>
+
+              <!-- Heroic Inspiration -->
+              <div class="inspiration-box">
+                <input type="checkbox" id="heroic-inspiration">
+                <label>Heroic Inspiration</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Middle Column: Int, Wis, Cha + Combat Info -->
+          <div class="middle-column">
+            <!-- Intelligence -->
+            <div class="ability-block" data-ability="intelligence">
+              <div class="ability-header">Intelligence</div>
+              <div class="ability-main">
+                <span class="modifier" id="int-mod">+0</span>
+                <input type="number" class="score-input" id="int-score" value="10" min="1" max="30">
+              </div>
+              <div class="saving-throw">
+                <input type="checkbox" id="int-save-prof">
+                <span class="save-value" id="int-save">+0</span>
+                <label>Saving Throw</label>
+              </div>
+              <div class="skills-list">
+                <div class="skill-row">
+                  <input type="checkbox" id="arcana-prof">
+                  <span class="skill-value" id="arcana-val">+0</span>
+                  <label>Arcana</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="history-prof">
+                  <span class="skill-value" id="history-val">+0</span>
+                  <label>History</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="investigation-prof">
+                  <span class="skill-value" id="investigation-val">+0</span>
+                  <label>Investigation</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="nature-prof">
+                  <span class="skill-value" id="nature-val">+0</span>
+                  <label>Nature</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="religion-prof">
+                  <span class="skill-value" id="religion-val">+0</span>
+                  <label>Religion</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Wisdom -->
+            <div class="ability-block" data-ability="wisdom">
+              <div class="ability-header">Wisdom</div>
+              <div class="ability-main">
+                <span class="modifier" id="wis-mod">+0</span>
+                <input type="number" class="score-input" id="wis-score" value="10" min="1" max="30">
+              </div>
+              <div class="saving-throw">
+                <input type="checkbox" id="wis-save-prof">
+                <span class="save-value" id="wis-save">+0</span>
+                <label>Saving Throw</label>
+              </div>
+              <div class="skills-list">
+                <div class="skill-row">
+                  <input type="checkbox" id="animal-handling-prof">
+                  <span class="skill-value" id="animal-handling-val">+0</span>
+                  <label>Animal Handling</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="insight-prof">
+                  <span class="skill-value" id="insight-val">+0</span>
+                  <label>Insight</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="medicine-prof">
+                  <span class="skill-value" id="medicine-val">+0</span>
+                  <label>Medicine</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="perception-prof">
+                  <span class="skill-value" id="perception-val">+0</span>
+                  <label>Perception</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="survival-prof">
+                  <span class="skill-value" id="survival-val">+0</span>
+                  <label>Survival</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charisma -->
+            <div class="ability-block" data-ability="charisma">
+              <div class="ability-header">Charisma</div>
+              <div class="ability-main">
+                <span class="modifier" id="cha-mod">+0</span>
+                <input type="number" class="score-input" id="cha-score" value="10" min="1" max="30">
+              </div>
+              <div class="saving-throw">
+                <input type="checkbox" id="cha-save-prof">
+                <span class="save-value" id="cha-save">+0</span>
+                <label>Saving Throw</label>
+              </div>
+              <div class="skills-list">
+                <div class="skill-row">
+                  <input type="checkbox" id="deception-prof">
+                  <span class="skill-value" id="deception-val">+0</span>
+                  <label>Deception</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="intimidation-prof">
+                  <span class="skill-value" id="intimidation-val">+0</span>
+                  <label>Intimidation</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="performance-prof">
+                  <span class="skill-value" id="performance-val">+0</span>
+                  <label>Performance</label>
+                </div>
+                <div class="skill-row">
+                  <input type="checkbox" id="persuasion-prof">
+                  <span class="skill-value" id="persuasion-val">+0</span>
+                  <label>Persuasion</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Combat Info Row -->
+            <div class="combat-info-row">
+              <div class="combat-stat">
+                <span class="stat-value" id="initiative">+0</span>
+                <label>Initiative</label>
+              </div>
+              <div class="combat-stat">
+                <input type="text" id="speed" value="30 ft">
+                <label>Speed</label>
+              </div>
+              <div class="combat-stat">
+                <input type="text" id="size" value="Medium">
+                <label>Size</label>
+              </div>
+              <div class="combat-stat">
+                <span class="stat-value" id="passive-perception">10</span>
+                <label>Passive Perception</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Features & Equipment -->
+          <div class="right-column">
+            <!-- Weapons & Damage Cantrips -->
+            <div class="feature-box" id="weapons-section">
+              <div class="feature-header">Weapons & Damage Cantrips</div>
+              <div class="feature-content">
+                <div class="weapons-table">
+                  <div class="weapons-header-row">
+                    <span>Name</span>
+                    <span>Atk/DC</span>
+                    <span>Damage</span>
+                    <span>Notes</span>
+                  </div>
+                  <div class="weapons-rows" id="weapons-list">
+                    <!-- Weapon rows will be added dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Class Features -->
+            <div class="feature-box" id="class-features-section">
+              <div class="feature-header">Class Features</div>
+              <div class="feature-content" id="class-features-content">
+                <!-- Features will be added dynamically -->
+              </div>
+            </div>
+
+            <!-- Bottom Row: Species Traits & Feats -->
+            <div class="bottom-features">
+              <div class="feature-box" id="species-traits-section">
+                <div class="feature-header">Species Traits</div>
+                <div class="feature-content" id="species-traits-content">
+                  <!-- Traits will be added dynamically -->
+                </div>
+              </div>
+              <div class="feature-box" id="feats-section">
+                <div class="feature-header">Feats</div>
+                <div class="feature-content" id="feats-content">
+                  <!-- Feats will be added dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Equipment Training Section -->
+        <section class="equipment-training-section">
+          <div class="section-header">Equipment Training & Proficiencies</div>
+          <div class="training-grid">
+            <div class="training-field">
+              <label>Armor Training</label>
+              <div class="armor-checkboxes">
+                <label><input type="checkbox" id="armor-light"> Light</label>
+                <label><input type="checkbox" id="armor-medium"> Medium</label>
+                <label><input type="checkbox" id="armor-heavy"> Heavy</label>
+                <label><input type="checkbox" id="armor-shields"> Shields</label>
+              </div>
+            </div>
+            <div class="training-field">
+              <label>Weapons</label>
+              <input type="text" id="weapon-proficiencies" placeholder="Simple, Martial, etc.">
+            </div>
+            <div class="training-field">
+              <label>Tools</label>
+              <input type="text" id="tool-proficiencies" placeholder="Thieves' tools, etc.">
+            </div>
+          </div>
+        </section>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button id="save-btn" class="btn primary">Save Character</button>
+          <button id="delete-btn" class="btn danger">Delete Character</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
