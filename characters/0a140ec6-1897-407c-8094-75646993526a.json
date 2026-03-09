@@ -8,7 +8,7 @@
   "level": 8,
   "xp": 0,
   "armorClass": 17,
-  "shield": 0,
+  "shieldEquipped": true,
   "hpCurrent": 0,
   "hpTemp": 0,
   "hpLevel1": 8,
@@ -64,6 +64,22 @@
     "heavy": false,
     "shields": true
   },
-  "weaponProficiencies": "Simple (Artificer), Firearms (Artificer), Martial (BattleSmith)",
-  "toolProficiencies": "Smith's (BattleSmith), Tinker's (Artificer). Woodcarver (Artificer), Thieves (Artificer), Calligrapher's (Sage)"
+  "weaponProficiencies": "Simple, Firearms, Martial",
+  "toolProficiencies": "Smith's, Tinker's, Woodcarver's, Thieves', Calligrapher's",
+  "weapons": [
+    {
+      "name": "Pistol",
+      "atk": "+8",
+      "damage": "1d10+5 (piercing)",
+      "notes": "Range 30/90"
+    }
+  ],
+  "classFeatures": [
+    {
+      "title": "Battle Ready",
+      "description": "Apply Int. Modifier for atk & dmg rolls with a magic weapon."
+    }
+  ],
+  "speciesTraits": [],
+  "feats": []
 }

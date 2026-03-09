@@ -208,12 +208,12 @@ body {
   gap: 15px;
 }
 
-.level-xp-group, .ac-shield-group {
+.level-xp-group {
   display: flex;
   gap: 8px;
 }
 
-.level-box, .xp-box, .armor-class-box, .shield-box {
+.level-box, .xp-box, .armor-class-box {
   text-align: center;
   background: var(--bg-medium);
   padding: 10px;
@@ -225,7 +225,7 @@ body {
   border-color: var(--gold);
 }
 
-.level-box input, .xp-box input, .armor-class-box input, .shield-box input {
+.level-box input, .xp-box input, .armor-class-box > input {
   width: 50px;
   height: 40px;
   font-size: 1.2rem;
@@ -237,16 +237,16 @@ body {
   font-weight: bold;
 }
 
-.level-box input:focus, .xp-box input:focus, .armor-class-box input:focus, .shield-box input:focus {
+.level-box input:focus, .xp-box input:focus, .armor-class-box > input:focus {
   outline: none;
   border-color: var(--gold);
 }
 
-.armor-class-box input {
+.armor-class-box > input {
   color: var(--gold);
 }
 
-.level-box label, .xp-box label, .armor-class-box label, .shield-box label {
+.level-box > label, .xp-box > label, .armor-class-box > label {
   display: block;
   margin-top: 5px;
   font-size: 0.6rem;
@@ -255,37 +255,61 @@ body {
   letter-spacing: 1px;
 }
 
+.shield-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.shield-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.shield-toggle label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
 /* ====== COMBAT ROW ====== */
 .combat-row {
   display: flex;
-  gap: 15px;
+  gap: 10px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.hp-section, .hit-dice-section, .death-saves-section {
+.hp-section, .hit-dice-section, .death-saves-section, .combat-stats-group {
   background: var(--bg-medium);
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   border: 2px solid var(--border);
 }
 
 .hp-section {
-  flex: 2;
+  flex: 0 0 auto;
 }
 
 .hp-header, .section-header {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--gold);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: bold;
 }
 
 .hp-inputs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .hp-field, .hit-dice-field {
@@ -293,9 +317,9 @@ body {
 }
 
 .hp-field input, .hit-dice-field input {
-  width: 55px;
-  height: 35px;
-  font-size: 1rem;
+  width: 50px;
+  height: 32px;
+  font-size: 0.95rem;
   text-align: center;
   background: var(--bg-dark);
   border: 1px solid var(--border);
@@ -324,15 +348,15 @@ body {
 
 .hp-formula {
   display: flex;
-  gap: 8px;
-  padding-top: 8px;
+  gap: 6px;
+  padding-top: 6px;
   border-top: 1px solid var(--border);
 }
 
 .hp-formula-field input {
-  width: 45px;
-  height: 28px;
-  font-size: 0.85rem;
+  width: 40px;
+  height: 26px;
+  font-size: 0.8rem;
   text-align: center;
   background: var(--bg-dark);
   border: 1px solid var(--border);
@@ -348,7 +372,7 @@ body {
 .hp-formula-field label {
   display: block;
   margin-top: 2px;
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   color: var(--text-muted);
   text-transform: uppercase;
 }
@@ -361,32 +385,81 @@ body {
 .death-saves {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .success-saves, .failure-saves {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .success-saves label, .failure-saves label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  width: 60px;
+  width: 55px;
 }
 
 .save-circles {
   display: flex;
-  gap: 4px;
+  gap: 3px;
 }
 
 .save-circles input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   cursor: pointer;
   accent-color: var(--gold);
+}
+
+/* Combat Stats Group (Initiative, Speed, Size, Passive Perception) */
+.combat-stats-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  flex: 1;
+}
+
+.combat-stats-group .combat-stat {
+  background: var(--bg-dark);
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+  border: none;
+}
+
+.combat-stats-group .combat-stat .stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--gold);
+  padding: 4px;
+}
+
+.combat-stats-group .combat-stat input {
+  width: 100%;
+  padding: 5px;
+  font-size: 0.85rem;
+  text-align: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+}
+
+.combat-stats-group .combat-stat input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.combat-stats-group .combat-stat label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* ====== MAIN CONTENT GRID ====== */
@@ -590,55 +663,6 @@ body {
   gap: 8px;
 }
 
-/* Combat Info Row */
-.combat-info-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-top: auto;
-}
-
-.combat-stat {
-  background: var(--bg-medium);
-  padding: 10px;
-  border-radius: 8px;
-  border: 2px solid var(--border);
-  text-align: center;
-}
-
-.combat-stat .stat-value {
-  display: block;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--gold);
-  padding: 5px;
-}
-
-.combat-stat input {
-  width: 100%;
-  padding: 6px;
-  font-size: 0.9rem;
-  text-align: center;
-  background: var(--bg-dark);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-}
-
-.combat-stat input:focus {
-  outline: none;
-  border-color: var(--gold);
-}
-
-.combat-stat label {
-  display: block;
-  margin-top: 4px;
-  font-size: 0.55rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
 /* Right Column */
 .right-column {
   display: flex;
@@ -654,6 +678,14 @@ body {
   overflow: hidden;
 }
 
+.feature-box.minimized .feature-content {
+  display: none;
+}
+
+.feature-box.minimized .feature-header {
+  border-bottom: none;
+}
+
 .feature-header {
   background: var(--bg-light);
   padding: 8px 12px;
@@ -663,13 +695,45 @@ body {
   letter-spacing: 1px;
   font-weight: bold;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-header span {
+  flex: 1;
+}
+
+.minimize-btn, .add-btn {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: var(--bg-dark);
+  color: var(--gold);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.minimize-btn:hover, .add-btn:hover {
+  background: var(--border-light);
 }
 
 .feature-content {
   padding: 10px;
-  min-height: 80px;
+  min-height: 60px;
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+.feature-box.minimized + .feature-box .feature-content,
+.feature-box:not(.minimized) .feature-content {
+  min-height: 60px;
 }
 
 #weapons-section {
@@ -680,6 +744,10 @@ body {
   flex: 1;
 }
 
+#class-features-section.minimized {
+  flex: 0 0 auto;
+}
+
 /* Weapons Table */
 .weapons-table {
   width: 100%;
@@ -687,7 +755,7 @@ body {
 
 .weapons-header-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr 24px;
   gap: 8px;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border);
@@ -701,7 +769,87 @@ body {
 }
 
 .weapons-rows {
-  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weapon-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr 24px;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+
+.weapon-row span {
+  font-size: 0.8rem;
+  color: var(--text);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.weapon-row .delete-weapon-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.weapon-row .delete-weapon-btn:hover {
+  background: #d13550;
+}
+
+/* Class Features List */
+.class-feature-item {
+  background: var(--bg-dark);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.class-feature-item .feature-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.class-feature-item .feature-item-title {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.class-feature-item .delete-feature-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.class-feature-item .delete-feature-btn:hover {
+  background: #d13550;
+}
+
+.class-feature-item .feature-item-desc {
+  font-size: 0.8rem;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Bottom Features Row */
@@ -709,6 +857,17 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  transition: margin 0.2s ease;
+}
+
+/* When both boxes in a row are minimized, reduce the row's visual footprint */
+.bottom-features:has(.feature-box:first-child.minimized):has(.feature-box:last-child.minimized) {
+  margin-bottom: -5px;
+}
+
+/* When the row above is fully collapsed, this row moves up more */
+.bottom-features.row-above-collapsed {
+  margin-top: -5px;
 }
 
 /* ====== EQUIPMENT TRAINING SECTION ====== */
@@ -718,28 +877,33 @@ body {
   border-radius: 8px;
   border: 2px solid var(--border);
   margin-bottom: 20px;
+  max-width: 420px;
 }
 
 .equipment-training-section .section-header {
   margin-bottom: 10px;
 }
 
-.training-grid {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr;
-  gap: 15px;
-  align-items: start;
+.training-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.training-field label {
-  display: block;
+.training-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.training-row > label {
   font-size: 0.65rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  margin-bottom: 5px;
+  letter-spacing: 1px;
 }
 
-.training-field input[type="text"] {
+.training-row textarea {
   width: 100%;
   padding: 8px;
   background: var(--bg-dark);
@@ -747,9 +911,15 @@ body {
   border-radius: 4px;
   color: var(--text);
   font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 36px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
-.training-field input[type="text"]:focus {
+.training-row textarea:focus {
   outline: none;
   border-color: var(--gold);
 }
@@ -861,7 +1031,134 @@ body {
     grid-template-columns: 1fr;
   }
   
-  .training-grid {
-    grid-template-columns: 1fr;
+  .equipment-training-section {
+    max-width: 100%;
   }
+}
+
+/* ====== MODAL STYLES ====== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--bg-medium);
+  border-radius: 12px;
+  border: 2px solid var(--gold);
+  width: 90%;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  color: var(--gold);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modal-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: var(--bg-dark);
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: var(--accent);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.bullet-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.bullet-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.modal-footer .btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
 }

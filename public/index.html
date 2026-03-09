@@ -59,15 +59,13 @@
                 <label>XP</label>
               </div>
             </div>
-            <div class="ac-shield-group">
-              <div class="armor-class-box">
-                <input type="number" id="armor-class" value="10" min="0">
-                <label>Armor Class</label>
+            <div class="armor-class-box">
+              <input type="number" id="armor-class" value="10" min="0">
+              <div class="shield-toggle">
+                <input type="checkbox" id="shield-equipped">
+                <label for="shield-equipped">Shield (+2)</label>
               </div>
-              <div class="shield-box">
-                <input type="number" id="shield" value="0" min="0">
-                <label>Shield</label>
-              </div>
+              <label>Armor Class</label>
             </div>
           </div>
         </header>
@@ -133,6 +131,24 @@
                   <input type="checkbox" id="death-fail-3">
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="combat-stats-group">
+            <div class="combat-stat">
+              <span class="stat-value" id="initiative">+0</span>
+              <label>Initiative</label>
+            </div>
+            <div class="combat-stat">
+              <input type="text" id="speed" value="30 ft">
+              <label>Speed</label>
+            </div>
+            <div class="combat-stat">
+              <input type="text" id="size" value="Medium">
+              <label>Size</label>
+            </div>
+            <div class="combat-stat">
+              <span class="stat-value" id="passive-perception">10</span>
+              <label>Passive Perc.</label>
             </div>
           </div>
         </section>
@@ -342,40 +358,25 @@
                 </div>
               </div>
             </div>
-
-            <!-- Combat Info Row -->
-            <div class="combat-info-row">
-              <div class="combat-stat">
-                <span class="stat-value" id="initiative">+0</span>
-                <label>Initiative</label>
-              </div>
-              <div class="combat-stat">
-                <input type="text" id="speed" value="30 ft">
-                <label>Speed</label>
-              </div>
-              <div class="combat-stat">
-                <input type="text" id="size" value="Medium">
-                <label>Size</label>
-              </div>
-              <div class="combat-stat">
-                <span class="stat-value" id="passive-perception">10</span>
-                <label>Passive Perception</label>
-              </div>
-            </div>
           </div>
 
           <!-- Right Column: Features & Equipment -->
           <div class="right-column">
             <!-- Weapons & Damage Cantrips -->
-            <div class="feature-box" id="weapons-section">
-              <div class="feature-header">Weapons & Damage Cantrips</div>
+            <div class="feature-box minimizable" id="weapons-section">
+              <div class="feature-header">
+                <button class="minimize-btn" data-target="weapons-section">−</button>
+                <span>Weapons & Damage Cantrips</span>
+                <button class="add-btn" id="add-weapon-btn">+</button>
+              </div>
               <div class="feature-content">
                 <div class="weapons-table">
                   <div class="weapons-header-row">
                     <span>Name</span>
-                    <span>Atk/DC</span>
+                    <span>Atk</span>
                     <span>Damage</span>
                     <span>Notes</span>
+                    <span></span>
                   </div>
                   <div class="weapons-rows" id="weapons-list">
                     <!-- Weapon rows will be added dynamically -->
@@ -385,8 +386,12 @@
             </div>
 
             <!-- Class Features -->
-            <div class="feature-box" id="class-features-section">
-              <div class="feature-header">Class Features</div>
+            <div class="feature-box minimizable" id="class-features-section">
+              <div class="feature-header">
+                <button class="minimize-btn" data-target="class-features-section">−</button>
+                <span>Class Features</span>
+                <button class="add-btn" id="add-class-feature-btn">+</button>
+              </div>
               <div class="feature-content" id="class-features-content">
                 <!-- Features will be added dynamically -->
               </div>
@@ -394,27 +399,107 @@
 
             <!-- Bottom Row: Species Traits & Feats -->
             <div class="bottom-features">
-              <div class="feature-box" id="species-traits-section">
-                <div class="feature-header">Species Traits</div>
+              <div class="feature-box minimizable" id="species-traits-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="species-traits-section">−</button>
+                  <span>Species Traits</span>
+                  <button class="add-btn" id="add-species-trait-btn">+</button>
+                </div>
                 <div class="feature-content" id="species-traits-content">
                   <!-- Traits will be added dynamically -->
                 </div>
               </div>
-              <div class="feature-box" id="feats-section">
-                <div class="feature-header">Feats</div>
+              <div class="feature-box minimizable" id="feats-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="feats-section">−</button>
+                  <span>Feats</span>
+                  <button class="add-btn" id="add-feat-btn">+</button>
+                </div>
                 <div class="feature-content" id="feats-content">
                   <!-- Feats will be added dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Languages & Resistances -->
+            <div class="bottom-features">
+              <div class="feature-box minimizable" id="languages-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="languages-section">−</button>
+                  <span>Languages</span>
+                  <button class="add-btn" id="add-language-btn">+</button>
+                </div>
+                <div class="feature-content" id="languages-content">
+                  <!-- Languages will be added dynamically -->
+                </div>
+              </div>
+              <div class="feature-box minimizable" id="resistances-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="resistances-section">−</button>
+                  <span>Resistances</span>
+                  <button class="add-btn" id="add-resistance-btn">+</button>
+                </div>
+                <div class="feature-content" id="resistances-content">
+                  <!-- Resistances will be added dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 3: Equipment & Coins -->
+            <div class="bottom-features">
+              <div class="feature-box minimizable" id="equipment-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="equipment-section">−</button>
+                  <span>Equipment</span>
+                  <button class="add-btn" id="add-equipment-btn">+</button>
+                </div>
+                <div class="feature-content" id="equipment-content">
+                  <!-- Equipment will be added dynamically -->
+                </div>
+              </div>
+              <div class="feature-box minimizable" id="coins-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="coins-section">−</button>
+                  <span>Coins</span>
+                  <button class="add-btn" id="add-coin-btn">+</button>
+                </div>
+                <div class="feature-content" id="coins-content">
+                  <!-- Coins will be added dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4: Spellcasting Ability & Spell Slots -->
+            <div class="bottom-features">
+              <div class="feature-box minimizable" id="spellcasting-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="spellcasting-section">−</button>
+                  <span>Spellcasting Ability</span>
+                  <button class="add-btn" id="add-spellcasting-btn">+</button>
+                </div>
+                <div class="feature-content" id="spellcasting-content">
+                  <!-- Spellcasting info will be added dynamically -->
+                </div>
+              </div>
+              <div class="feature-box minimizable" id="spell-slots-section">
+                <div class="feature-header">
+                  <button class="minimize-btn" data-target="spell-slots-section">−</button>
+                  <span>Spell Slots</span>
+                  <button class="add-btn" id="add-spell-slot-btn">+</button>
+                </div>
+                <div class="feature-content" id="spell-slots-content">
+                  <!-- Spell slots will be added dynamically -->
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Equipment Training Section -->
+        <!-- Equipment Training Section (restructured) -->
         <section class="equipment-training-section">
           <div class="section-header">Equipment Training & Proficiencies</div>
-          <div class="training-grid">
-            <div class="training-field">
+          <div class="training-stack">
+            <div class="training-row">
               <label>Armor Training</label>
               <div class="armor-checkboxes">
                 <label><input type="checkbox" id="armor-light"> Light</label>
@@ -423,13 +508,13 @@
                 <label><input type="checkbox" id="armor-shields"> Shields</label>
               </div>
             </div>
-            <div class="training-field">
+            <div class="training-row">
               <label>Weapons</label>
-              <input type="text" id="weapon-proficiencies" placeholder="Simple, Martial, etc.">
+              <textarea id="weapon-proficiencies" placeholder="Simple, Martial, etc." rows="1"></textarea>
             </div>
-            <div class="training-field">
+            <div class="training-row">
               <label>Tools</label>
-              <input type="text" id="tool-proficiencies" placeholder="Thieves' tools, etc.">
+              <textarea id="tool-proficiencies" placeholder="Thieves' tools, etc." rows="1"></textarea>
             </div>
           </div>
         </section>
@@ -441,6 +526,63 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Weapon Modal -->
+  <div class="modal-overlay" id="weapon-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Weapon / Cantrip</h3>
+        <button class="modal-close" data-modal="weapon-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="weapon-name" placeholder="e.g., Longsword, Fire Bolt">
+        </div>
+        <div class="form-group">
+          <label>Attack Bonus / DC</label>
+          <input type="text" id="weapon-atk" placeholder="e.g., +5, DC 14">
+        </div>
+        <div class="form-group">
+          <label>Damage & Type</label>
+          <input type="text" id="weapon-damage" placeholder="e.g., 1d8+3 slashing">
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="weapon-notes" placeholder="e.g., Versatile (1d10)">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="weapon-modal">Cancel</button>
+        <button class="btn primary" id="save-weapon-btn">Add Weapon</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Class Feature Modal -->
+  <div class="modal-overlay" id="class-feature-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Class Feature</h3>
+        <button class="modal-close" data-modal="class-feature-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Feature Name</label>
+          <input type="text" id="feature-title" placeholder="e.g., Rage, Sneak Attack">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="feature-description" rows="4" placeholder="Describe the feature..."></textarea>
+          <button class="bullet-btn" id="add-bullet-btn">• Add Bullet Point</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="class-feature-modal">Cancel</button>
+        <button class="btn primary" id="save-class-feature-btn">Add Feature</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>

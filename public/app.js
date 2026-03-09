@@ -147,7 +147,7 @@ function populateForm(char) {
   
   // Combat stats
   document.getElementById('armor-class').value = char.armorClass || 10;
-  document.getElementById('shield').value = char.shield || 0;
+  document.getElementById('shield-equipped').checked = char.shieldEquipped || false;
   document.getElementById('hp-current').value = char.hpCurrent || 0;
   document.getElementById('hp-temp').value = char.hpTemp || 0;
   document.getElementById('hp-level1').value = char.hpLevel1 || 0;
@@ -206,6 +206,12 @@ function populateForm(char) {
   document.getElementById('weapon-proficiencies').value = char.weaponProficiencies || '';
   document.getElementById('tool-proficiencies').value = char.toolProficiencies || '';
   
+  // Weapons
+  renderWeapons(char.weapons || []);
+  
+  // Class Features
+  renderClassFeatures(char.classFeatures || []);
+  
   updateAllCalculations();
 }
 
@@ -239,7 +245,7 @@ function getFormData() {
     level: parseInt(document.getElementById('char-level').value) || 1,
     xp: parseInt(document.getElementById('char-xp').value) || 0,
     armorClass: parseInt(document.getElementById('armor-class').value) || 10,
-    shield: parseInt(document.getElementById('shield').value) || 0,
+    shieldEquipped: document.getElementById('shield-equipped').checked,
     hpCurrent: parseInt(document.getElementById('hp-current').value) || 0,
     hpTemp: parseInt(document.getElementById('hp-temp').value) || 0,
     hpLevel1: parseInt(document.getElementById('hp-level1').value) || 0,
@@ -275,6 +281,10 @@ function getFormData() {
     },
     weaponProficiencies: document.getElementById('weapon-proficiencies').value,
     toolProficiencies: document.getElementById('tool-proficiencies').value,
+    weapons: currentCharacter?.weapons || [],
+    classFeatures: currentCharacter?.classFeatures || [],
+    speciesTraits: currentCharacter?.speciesTraits || [],
+    feats: currentCharacter?.feats || [],
   };
 }
 
@@ -353,9 +363,197 @@ function updateAllCalculations() {
   updateHitDice();
 }
 
+// ====== WEAPONS ======
+function renderWeapons(weapons) {
+  const container = document.getElementById('weapons-list');
+  container.innerHTML = '';
+  
+  weapons.forEach((weapon, index) => {
+    const row = document.createElement('div');
+    row.className = 'weapon-row';
+    row.innerHTML = `
+      <span>${weapon.name}</span>
+      <span>${weapon.atk}</span>
+      <span>${weapon.damage}</span>
+      <span>${weapon.notes}</span>
+      <button class="delete-weapon-btn" data-index="${index}">&times;</button>
+    `;
+    container.appendChild(row);
+  });
+  
+  // Add delete listeners
+  container.querySelectorAll('.delete-weapon-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = parseInt(e.target.dataset.index);
+      deleteWeapon(index);
+    });
+  });
+}
+
+function deleteWeapon(index) {
+  if (!currentCharacter.weapons) return;
+  currentCharacter.weapons.splice(index, 1);
+  renderWeapons(currentCharacter.weapons);
+}
+
+function openWeaponModal() {
+  document.getElementById('weapon-name').value = '';
+  document.getElementById('weapon-atk').value = '';
+  document.getElementById('weapon-damage').value = '';
+  document.getElementById('weapon-notes').value = '';
+  document.getElementById('weapon-modal').classList.add('active');
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('active');
+}
+
+function saveWeapon() {
+  const weapon = {
+    name: document.getElementById('weapon-name').value,
+    atk: document.getElementById('weapon-atk').value,
+    damage: document.getElementById('weapon-damage').value,
+    notes: document.getElementById('weapon-notes').value,
+  };
+  
+  if (!weapon.name) return;
+  
+  if (!currentCharacter.weapons) {
+    currentCharacter.weapons = [];
+  }
+  currentCharacter.weapons.push(weapon);
+  renderWeapons(currentCharacter.weapons);
+  closeModal('weapon-modal');
+}
+
+// ====== CLASS FEATURES ======
+function renderClassFeatures(features) {
+  const container = document.getElementById('class-features-content');
+  container.innerHTML = '';
+  
+  features.forEach((feature, index) => {
+    const item = document.createElement('div');
+    item.className = 'class-feature-item';
+    item.innerHTML = `
+      <div class="feature-item-header">
+        <span class="feature-item-title">${feature.title}</span>
+        <button class="delete-feature-btn" data-index="${index}">&times;</button>
+      </div>
+      <div class="feature-item-desc">${feature.description}</div>
+    `;
+    container.appendChild(item);
+  });
+  
+  // Add delete listeners
+  container.querySelectorAll('.delete-feature-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = parseInt(e.target.dataset.index);
+      deleteClassFeature(index);
+    });
+  });
+}
+
+function deleteClassFeature(index) {
+  if (!currentCharacter.classFeatures) return;
+  currentCharacter.classFeatures.splice(index, 1);
+  renderClassFeatures(currentCharacter.classFeatures);
+}
+
+function openClassFeatureModal() {
+  document.getElementById('feature-title').value = '';
+  document.getElementById('feature-description').value = '';
+  document.getElementById('class-feature-modal').classList.add('active');
+}
+
+function saveClassFeature() {
+  const feature = {
+    title: document.getElementById('feature-title').value,
+    description: document.getElementById('feature-description').value,
+  };
+  
+  if (!feature.title) return;
+  
+  if (!currentCharacter.classFeatures) {
+    currentCharacter.classFeatures = [];
+  }
+  currentCharacter.classFeatures.push(feature);
+  renderClassFeatures(currentCharacter.classFeatures);
+  closeModal('class-feature-modal');
+}
+
+function addBulletPoint() {
+  const textarea = document.getElementById('feature-description');
+  const cursorPos = textarea.selectionStart;
+  const text = textarea.value;
+  const before = text.substring(0, cursorPos);
+  const after = text.substring(cursorPos);
+  textarea.value = before + '\n• ' + after;
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = cursorPos + 3;
+}
+
+// ====== MINIMIZE TOGGLE ======
+// Define the row structure for the right column feature boxes
+const featureRows = [
+  ['species-traits-section', 'feats-section'],
+  ['languages-section', 'resistances-section'],
+  ['equipment-section', 'coins-section'],
+  ['spellcasting-section', 'spell-slots-section'],
+];
+
+function isRowFullyMinimized(rowIndex) {
+  if (rowIndex < 0 || rowIndex >= featureRows.length) return true;
+  const row = featureRows[rowIndex];
+  return row.every(sectionId => {
+    const section = document.getElementById(sectionId);
+    return section && section.classList.contains('minimized');
+  });
+}
+
+function updateRowVisibility() {
+  // For each row (starting from row 1), check if all previous rows are fully minimized
+  featureRows.forEach((row, rowIndex) => {
+    row.forEach(sectionId => {
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+      
+      const parentRow = section.closest('.bottom-features');
+      if (!parentRow) return;
+      
+      // Check if all rows above this one are fully minimized
+      let allAboveMinimized = true;
+      for (let i = 0; i < rowIndex; i++) {
+        if (!isRowFullyMinimized(i)) {
+          allAboveMinimized = false;
+          break;
+        }
+      }
+      
+      // Add class to parent row to indicate if rows above are collapsed
+      if (allAboveMinimized && rowIndex > 0 && isRowFullyMinimized(rowIndex - 1)) {
+        parentRow.classList.add('row-above-collapsed');
+      } else {
+        parentRow.classList.remove('row-above-collapsed');
+      }
+    });
+  });
+}
+
+function toggleMinimize(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  
+  const btn = section.querySelector('.minimize-btn');
+  section.classList.toggle('minimized');
+  btn.textContent = section.classList.contains('minimized') ? '+' : '−';
+  
+  // Update row visibility after toggling
+  updateRowVisibility();
+}
+
 // Event Listeners
 newCharacterBtn.addEventListener('click', () => {
-  currentCharacter = { id: null };
+  currentCharacter = { id: null, weapons: [], classFeatures: [], speciesTraits: [], feats: [] };
   showCharacterSheet();
   populateForm({});
   renderCharacterList();
@@ -414,6 +612,74 @@ document.getElementById('char-level').addEventListener('input', () => {
 // HP formula changes
 document.getElementById('hp-level1').addEventListener('input', updateHp);
 document.getElementById('hp-per-level').addEventListener('input', updateHp);
+
+// Shield toggle - recalculate displayed AC
+document.getElementById('shield-equipped').addEventListener('change', (e) => {
+  const baseAC = parseInt(document.getElementById('armor-class').value) || 10;
+  // Visual feedback only - the actual AC stored is the base
+});
+
+// Weapon modal
+document.getElementById('add-weapon-btn').addEventListener('click', openWeaponModal);
+document.getElementById('save-weapon-btn').addEventListener('click', saveWeapon);
+
+// Class feature modal
+document.getElementById('add-class-feature-btn').addEventListener('click', openClassFeatureModal);
+document.getElementById('save-class-feature-btn').addEventListener('click', saveClassFeature);
+document.getElementById('add-bullet-btn').addEventListener('click', addBulletPoint);
+
+// Species traits & Feats placeholders (+ buttons don't do anything yet)
+document.getElementById('add-species-trait-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+document.getElementById('add-feat-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+
+// New section placeholders (+ buttons don't do anything yet)
+document.getElementById('add-language-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+document.getElementById('add-resistance-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+document.getElementById('add-equipment-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+document.getElementById('add-coin-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+document.getElementById('add-spellcasting-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+document.getElementById('add-spell-slot-btn').addEventListener('click', () => {
+  // Placeholder - not implemented yet
+});
+
+// Modal close buttons
+document.querySelectorAll('.modal-close, .modal-footer .btn:not(.primary)').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const modalId = e.target.dataset.modal;
+    if (modalId) closeModal(modalId);
+  });
+});
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+    }
+  });
+});
+
+// Minimize buttons
+document.querySelectorAll('.minimize-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const sectionId = e.target.dataset.target;
+    toggleMinimize(sectionId);
+  });
+});
 
 // Initialize
 fetchCharacters();
