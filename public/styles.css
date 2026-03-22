@@ -464,11 +464,21 @@ body {
 
 /* ====== MAIN CONTENT GRID ====== */
 .main-content {
-  display: grid;
-  grid-template-columns: 180px 220px 1fr;
-  grid-template-rows: auto auto;
+  display: flex;
   gap: 15px;
   margin-bottom: 20px;
+}
+
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-shrink: 0;
+}
+
+.stats-columns {
+  display: flex;
+  gap: 15px;
 }
 
 /* Left Column */
@@ -476,6 +486,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 180px;
+  flex-shrink: 0;
 }
 
 .proficiency-box {
@@ -691,6 +703,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 220px;
+  flex-shrink: 0;
 }
 
 /* Right Column */
@@ -698,7 +712,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  grid-row: 1 / 3;
+  flex: 1;
 }
 
 /* Feature Boxes */
@@ -1105,9 +1119,6 @@ body {
   padding: 12px;
   border-radius: 8px;
   border: 2px solid var(--border);
-  grid-column: 1 / 3;
-  grid-row: 2;
-  align-self: start;
 }
 
 .equipment-training-section .section-header {
@@ -1183,24 +1194,26 @@ body {
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 1200px) {
-  .main-content {
-    grid-template-columns: 180px 200px 1fr;
+  .left-column {
+    width: 170px;
+  }
+  
+  .middle-column {
+    width: 200px;
   }
 }
 
 @media (max-width: 1000px) {
   .main-content {
-    grid-template-columns: 1fr 1fr;
+    flex-direction: column;
   }
   
-  .right-column {
-    grid-column: span 2;
-    grid-row: auto;
+  .stats-section {
+    width: 100%;
   }
   
-  .equipment-training-section {
-    grid-column: span 2;
-    grid-row: auto;
+  .stats-columns {
+    justify-content: center;
   }
   
   .header-details {
@@ -1251,18 +1264,15 @@ body {
     width: auto;
   }
   
-  .main-content {
-    grid-template-columns: 1fr;
+  .stats-columns {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .right-column {
-    grid-column: span 1;
-    grid-row: auto;
-  }
-  
-  .equipment-training-section {
-    grid-column: span 1;
-    grid-row: auto;
+  .left-column,
+  .middle-column {
+    width: 100%;
+    max-width: 300px;
   }
   
   .combat-row {

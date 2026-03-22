@@ -155,24 +155,27 @@
 
         <!-- Main Content Grid -->
         <div class="main-content">
-          <!-- Left Column: Stats -->
-          <div class="left-column">
-            <!-- Proficiency Bonus -->
-            <div class="proficiency-box">
-              <input type="number" id="proficiency-bonus" value="2" min="1" max="6">
-              <label>Proficiency Bonus</label>
-            </div>
-
-            <!-- Ability Scores with Saving Throws and Skills -->
-            <div class="abilities-column">
-              <!-- Strength -->
-              <div class="ability-block" data-ability="strength">
-                <div class="ability-header">Strength</div>
-                <div class="ability-main">
-                  <span class="modifier" id="str-mod">+0</span>
-                  <input type="number" class="score-input" id="str-score" value="10" min="1" max="30">
+          <!-- Stats Section (left side) -->
+          <div class="stats-section">
+            <div class="stats-columns">
+              <!-- Left Column: Stats -->
+              <div class="left-column">
+                <!-- Proficiency Bonus -->
+                <div class="proficiency-box">
+                  <input type="number" id="proficiency-bonus" value="2" min="1" max="6">
+                  <label>Proficiency Bonus</label>
                 </div>
-                <div class="saving-throw">
+
+                <!-- Ability Scores with Saving Throws and Skills -->
+                <div class="abilities-column">
+                  <!-- Strength -->
+                  <div class="ability-block" data-ability="strength">
+                    <div class="ability-header">Strength</div>
+                    <div class="ability-main">
+                      <span class="modifier" id="str-mod">+0</span>
+                      <input type="number" class="score-input" id="str-score" value="10" min="1" max="30">
+                    </div>
+                    <div class="saving-throw">
                   <input type="checkbox" id="str-save-prof">
                   <span class="save-value" id="str-save">+0</span>
                   <label>Saving Throw</label>
@@ -359,30 +362,32 @@
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Equipment Training Section (spans left + middle columns) -->
-          <section class="equipment-training-section">
-            <div class="section-header">Equipment Training & Proficiencies</div>
-            <div class="training-stack">
-              <div class="training-row">
-                <label>Armor Training</label>
-                <div class="armor-checkboxes">
-                  <label><input type="checkbox" id="armor-light"> Light</label>
-                  <label><input type="checkbox" id="armor-medium"> Medium</label>
-                  <label><input type="checkbox" id="armor-heavy"> Heavy</label>
-                  <label><input type="checkbox" id="armor-shields"> Shields</label>
-                </div>
-              </div>
-              <div class="training-row">
-                <label>Weapons</label>
-                <textarea id="weapon-proficiencies" placeholder="Simple, Martial, etc." rows="1"></textarea>
-              </div>
-              <div class="training-row">
-                <label>Tools</label>
-                <textarea id="tool-proficiencies" placeholder="Thieves' tools, etc." rows="1"></textarea>
+        <!-- Equipment Training Section -->
+        <section class="equipment-training-section">
+          <div class="section-header">Equipment Training & Proficiencies</div>
+          <div class="training-stack">
+            <div class="training-row">
+              <label>Armor Training</label>
+              <div class="armor-checkboxes">
+                <label><input type="checkbox" id="armor-light"> Light</label>
+                <label><input type="checkbox" id="armor-medium"> Medium</label>
+                <label><input type="checkbox" id="armor-heavy"> Heavy</label>
+                <label><input type="checkbox" id="armor-shields"> Shields</label>
               </div>
             </div>
-          </section>
+            <div class="training-row">
+              <label>Weapons</label>
+              <textarea id="weapon-proficiencies" placeholder="Simple, Martial, etc." rows="1"></textarea>
+            </div>
+            <div class="training-row">
+              <label>Tools</label>
+              <textarea id="tool-proficiencies" placeholder="Thieves' tools, etc." rows="1"></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
 
           <!-- Right Column: Features & Equipment -->
           <div class="right-column">
