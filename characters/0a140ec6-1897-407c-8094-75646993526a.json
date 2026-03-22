@@ -143,5 +143,7 @@
     "Necrotic",
     "Radiant",
     "Cold"
-  ]
+  ],
+  "equipment": [],
+  "spellcastingAbility": "int"
 }

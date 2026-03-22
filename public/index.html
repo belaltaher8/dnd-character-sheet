@@ -360,6 +360,30 @@
             </div>
           </div>
 
+          <!-- Equipment Training Section (spans left + middle columns) -->
+          <section class="equipment-training-section">
+            <div class="section-header">Equipment Training & Proficiencies</div>
+            <div class="training-stack">
+              <div class="training-row">
+                <label>Armor Training</label>
+                <div class="armor-checkboxes">
+                  <label><input type="checkbox" id="armor-light"> Light</label>
+                  <label><input type="checkbox" id="armor-medium"> Medium</label>
+                  <label><input type="checkbox" id="armor-heavy"> Heavy</label>
+                  <label><input type="checkbox" id="armor-shields"> Shields</label>
+                </div>
+              </div>
+              <div class="training-row">
+                <label>Weapons</label>
+                <textarea id="weapon-proficiencies" placeholder="Simple, Martial, etc." rows="1"></textarea>
+              </div>
+              <div class="training-row">
+                <label>Tools</label>
+                <textarea id="tool-proficiencies" placeholder="Thieves' tools, etc." rows="1"></textarea>
+              </div>
+            </div>
+          </section>
+
           <!-- Right Column: Features & Equipment -->
           <div class="right-column">
             <!-- Weapons & Damage Cantrips -->
@@ -475,10 +499,30 @@
                 <div class="feature-header">
                   <button class="minimize-btn" data-target="spellcasting-section">−</button>
                   <span>Spellcasting Ability</span>
-                  <button class="add-btn" id="add-spellcasting-btn">+</button>
                 </div>
                 <div class="feature-content" id="spellcasting-content">
-                  <!-- Spellcasting info will be added dynamically -->
+                  <div class="spellcasting-selector">
+                    <button class="spell-ability-btn" data-ability="str">STR</button>
+                    <button class="spell-ability-btn" data-ability="dex">DEX</button>
+                    <button class="spell-ability-btn" data-ability="con">CON</button>
+                    <button class="spell-ability-btn" data-ability="int">INT</button>
+                    <button class="spell-ability-btn" data-ability="wis">WIS</button>
+                    <button class="spell-ability-btn" data-ability="cha">CHA</button>
+                  </div>
+                  <div class="spellcasting-stats">
+                    <div class="spell-stat">
+                      <span class="spell-stat-label">Spellcasting Modifier</span>
+                      <span class="spell-stat-value" id="spellcasting-mod">—</span>
+                    </div>
+                    <div class="spell-stat">
+                      <span class="spell-stat-label">Spell Save DC</span>
+                      <span class="spell-stat-value" id="spell-save-dc">—</span>
+                    </div>
+                    <div class="spell-stat">
+                      <span class="spell-stat-label">Spell Attack Bonus</span>
+                      <span class="spell-stat-value" id="spell-attack-bonus">—</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="feature-box minimizable" id="spell-slots-section">
@@ -494,30 +538,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Equipment Training Section (restructured) -->
-        <section class="equipment-training-section">
-          <div class="section-header">Equipment Training & Proficiencies</div>
-          <div class="training-stack">
-            <div class="training-row">
-              <label>Armor Training</label>
-              <div class="armor-checkboxes">
-                <label><input type="checkbox" id="armor-light"> Light</label>
-                <label><input type="checkbox" id="armor-medium"> Medium</label>
-                <label><input type="checkbox" id="armor-heavy"> Heavy</label>
-                <label><input type="checkbox" id="armor-shields"> Shields</label>
-              </div>
-            </div>
-            <div class="training-row">
-              <label>Weapons</label>
-              <textarea id="weapon-proficiencies" placeholder="Simple, Martial, etc." rows="1"></textarea>
-            </div>
-            <div class="training-row">
-              <label>Tools</label>
-              <textarea id="tool-proficiencies" placeholder="Thieves' tools, etc." rows="1"></textarea>
-            </div>
-          </div>
-        </section>
 
         <!-- Actions -->
         <div class="actions">
@@ -671,6 +691,31 @@
       <div class="modal-footer">
         <button class="btn" data-modal="resistance-modal">Cancel</button>
         <button class="btn primary" id="save-resistance-btn">Add Resistance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equipment Modal -->
+  <div class="modal-overlay" id="equipment-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Equipment</h3>
+        <button class="modal-close" data-modal="equipment-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Item Name</label>
+          <input type="text" id="equipment-title" placeholder="e.g., Rope (50 ft), Backpack">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="equipment-description" rows="4" placeholder="Notes about the item..."></textarea>
+          <button class="bullet-btn" id="add-equipment-bullet-btn">• Add Bullet Point</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="equipment-modal">Cancel</button>
+        <button class="btn primary" id="save-equipment-btn">Add Equipment</button>
       </div>
     </div>
   </div>

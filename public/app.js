@@ -230,6 +230,16 @@ function populateForm(char) {
   // Resistances
   renderSimpleItems('resistances-content', char.resistances || [], 'resistances');
   
+  // Equipment
+  renderDraggableItems('equipment-content', char.equipment || [], 'equipment');
+  
+  // Spellcasting Ability
+  document.querySelectorAll('.spell-ability-btn').forEach(btn => btn.classList.remove('selected'));
+  if (char.spellcastingAbility) {
+    const btn = document.querySelector(`.spell-ability-btn[data-ability="${char.spellcastingAbility}"]`);
+    if (btn) btn.classList.add('selected');
+  }
+  
   updateAllCalculations();
 }
 
@@ -311,6 +321,8 @@ function getFormData() {
     feats: currentCharacter?.feats || [],
     languages: currentCharacter?.languages || [],
     resistances: currentCharacter?.resistances || [],
+    equipment: currentCharacter?.equipment || [],
+    spellcastingAbility: currentCharacter?.spellcastingAbility || null,
   };
 }
 
@@ -424,6 +436,7 @@ function updateAllCalculations() {
   updatePassivePerception();
   updateHp();
   updateHitDice();
+  updateSpellcastingStats();
 }
 
 // ====== WEAPONS ======
@@ -634,6 +647,7 @@ function getContainerId(key) {
     'feats': 'feats-content',
     'languages': 'languages-content',
     'resistances': 'resistances-content',
+    'equipment': 'equipment-content',
   };
   return map[key];
 }
@@ -794,6 +808,71 @@ function saveResistance() {
   closeModal('resistance-modal');
 }
 
+// Equipment Modal
+function openEquipmentModal() {
+  document.getElementById('equipment-title').value = '';
+  document.getElementById('equipment-description').value = '';
+  document.getElementById('equipment-modal').classList.add('active');
+}
+
+function saveEquipment() {
+  const item = {
+    title: document.getElementById('equipment-title').value,
+    description: document.getElementById('equipment-description').value,
+  };
+  
+  if (!item.title) return;
+  
+  if (!currentCharacter.equipment) {
+    currentCharacter.equipment = [];
+  }
+  currentCharacter.equipment.push(item);
+  renderDraggableItems('equipment-content', currentCharacter.equipment, 'equipment');
+  closeModal('equipment-modal');
+}
+
+// ====== SPELLCASTING ======
+function setSpellcastingAbility(ability) {
+  // Remove selected from all buttons
+  document.querySelectorAll('.spell-ability-btn').forEach(btn => {
+    btn.classList.remove('selected');
+  });
+  
+  // Add selected to clicked button
+  const btn = document.querySelector(`.spell-ability-btn[data-ability="${ability}"]`);
+  if (btn) {
+    btn.classList.add('selected');
+  }
+  
+  currentCharacter.spellcastingAbility = ability;
+  updateSpellcastingStats();
+}
+
+function updateSpellcastingStats() {
+  const ability = currentCharacter?.spellcastingAbility;
+  const spellModEl = document.getElementById('spellcasting-mod');
+  const spellDcEl = document.getElementById('spell-save-dc');
+  const spellAtkEl = document.getElementById('spell-attack-bonus');
+  
+  if (!ability) {
+    spellModEl.textContent = '—';
+    spellDcEl.textContent = '—';
+    spellAtkEl.textContent = '—';
+    return;
+  }
+  
+  const abilityScore = parseInt(abilityInputs[ability]?.value) || 10;
+  const spellMod = calculateModifier(abilityScore);
+  const profBonus = parseInt(document.getElementById('proficiency-bonus').value) || 2;
+  
+  const spellSaveDc = 8 + profBonus + spellMod;
+  const spellAttackBonus = profBonus + spellMod;
+  
+  spellModEl.textContent = formatModifier(spellMod);
+  spellDcEl.textContent = spellSaveDc;
+  spellAtkEl.textContent = formatModifier(spellAttackBonus);
+}
+
 // ====== MINIMIZE TOGGLE ======
 // Define the row structure for the right column feature boxes
 const featureRows = [
@@ -946,14 +1025,20 @@ document.getElementById('save-resistance-btn').addEventListener('click', saveRes
 // Delete confirmation
 document.getElementById('confirm-delete-btn').addEventListener('click', executeDelete);
 
+// Equipment modal
+document.getElementById('add-equipment-btn').addEventListener('click', openEquipmentModal);
+document.getElementById('save-equipment-btn').addEventListener('click', saveEquipment);
+document.getElementById('add-equipment-bullet-btn').addEventListener('click', () => addBulletPoint('equipment-description'));
+
+// Spellcasting ability selector
+document.querySelectorAll('.spell-ability-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setSpellcastingAbility(btn.dataset.ability);
+  });
+});
+
 // Remaining placeholders (+ buttons don't do anything yet)
-document.getElementById('add-equipment-btn').addEventListener('click', () => {
-  // Placeholder - not implemented yet
-});
 document.getElementById('add-coin-btn').addEventListener('click', () => {
-  // Placeholder - not implemented yet
-});
-document.getElementById('add-spellcasting-btn').addEventListener('click', () => {
   // Placeholder - not implemented yet
 });
 document.getElementById('add-spell-slot-btn').addEventListener('click', () => {
