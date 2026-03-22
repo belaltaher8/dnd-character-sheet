@@ -391,26 +391,15 @@
 
           <!-- Right Column: Features & Equipment -->
           <div class="right-column">
-            <!-- Weapons & Damage Cantrips -->
-            <div class="feature-box minimizable" id="weapons-section">
+            <!-- Combat Actions -->
+            <div class="feature-box minimizable" id="combat-actions-section">
               <div class="feature-header">
-                <button class="minimize-btn" data-target="weapons-section">−</button>
-                <span>Weapons & Damage Cantrips</span>
-                <button class="add-btn" id="add-weapon-btn">+</button>
+                <button class="minimize-btn" data-target="combat-actions-section">−</button>
+                <span>Combat Actions</span>
+                <button class="add-btn" id="add-combat-action-btn">+</button>
               </div>
-              <div class="feature-content">
-                <div class="weapons-table">
-                  <div class="weapons-header-row">
-                    <span>Name</span>
-                    <span>Atk</span>
-                    <span>Damage</span>
-                    <span>Notes</span>
-                    <span></span>
-                  </div>
-                  <div class="weapons-rows" id="weapons-list">
-                    <!-- Weapon rows will be added dynamically -->
-                  </div>
-                </div>
+              <div class="feature-content" id="combat-actions-content">
+                <!-- Combat actions will be added dynamically -->
               </div>
             </div>
 
@@ -581,34 +570,67 @@
     </main>
   </div>
 
-  <!-- Weapon Modal -->
-  <div class="modal-overlay" id="weapon-modal">
-    <div class="modal">
+  <!-- Combat Action Modal -->
+  <div class="modal-overlay" id="combat-action-modal">
+    <div class="modal modal-wide">
       <div class="modal-header">
-        <h3>Add Weapon / Cantrip</h3>
-        <button class="modal-close" data-modal="weapon-modal">&times;</button>
+        <h3>Add Combat Action</h3>
+        <button class="modal-close" data-modal="combat-action-modal">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
+          <label>Action Type</label>
+          <div class="action-type-selector">
+            <button class="action-type-btn selected" data-type="weapon">Weapon</button>
+            <button class="action-type-btn" data-type="spell-attack">Spell Attack</button>
+            <button class="action-type-btn" data-type="spell-save">Spell Save</button>
+            <button class="action-type-btn" data-type="action">Action</button>
+          </div>
+        </div>
+        <div class="form-group">
           <label>Name</label>
-          <input type="text" id="weapon-name" placeholder="e.g., Longsword, Fire Bolt">
+          <input type="text" id="action-name" placeholder="e.g., Longsword, Fire Bolt">
         </div>
-        <div class="form-group">
-          <label>Attack Bonus / DC</label>
-          <input type="text" id="weapon-atk" placeholder="e.g., +5, DC 14">
+        <div class="form-row">
+          <div class="form-group" id="casting-time-group">
+            <label>Casting Time</label>
+            <input type="text" id="action-casting-time" value="Action" placeholder="Action, Bonus Action, etc.">
+          </div>
+          <div class="form-group" id="atk-bonus-group">
+            <label id="atk-bonus-label">Attack Bonus</label>
+            <input type="text" id="action-atk" placeholder="e.g., +5">
+          </div>
         </div>
-        <div class="form-group">
-          <label>Damage & Type</label>
-          <input type="text" id="weapon-damage" placeholder="e.g., 1d8+3 slashing">
+        <div class="form-row">
+          <div class="form-group" id="damage-group">
+            <label>Damage & Type</label>
+            <input type="text" id="action-damage" placeholder="e.g., 1d8+3 slashing">
+          </div>
+          <div class="form-group" id="range-group">
+            <label>Range</label>
+            <input type="text" id="action-range" placeholder="e.g., 5 ft, 120 ft">
+          </div>
+        </div>
+        <div class="form-group" id="uses-group" style="display: none;">
+          <label>Number of Uses</label>
+          <input type="number" id="action-uses" min="0" max="20" value="1" placeholder="e.g., 3">
+        </div>
+        <div class="form-group" id="spell-options-group" style="display: none;">
+          <label>Spell Properties</label>
+          <div class="spell-options">
+            <label class="spell-option"><input type="checkbox" id="action-concentration"> <span class="option-badge">C</span> Concentration</label>
+            <label class="spell-option"><input type="checkbox" id="action-ritual"> <span class="option-badge">R</span> Ritual</label>
+            <label class="spell-option"><input type="checkbox" id="action-materials"> <span class="option-badge">M</span> Materials</label>
+          </div>
         </div>
         <div class="form-group">
           <label>Notes</label>
-          <input type="text" id="weapon-notes" placeholder="e.g., Versatile (1d10)">
+          <input type="text" id="action-notes" placeholder="Additional notes...">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn" data-modal="weapon-modal">Cancel</button>
-        <button class="btn primary" id="save-weapon-btn">Add Weapon</button>
+        <button class="btn" data-modal="combat-action-modal">Cancel</button>
+        <button class="btn primary" id="save-combat-action-btn">Add Action</button>
       </div>
     </div>
   </div>

@@ -1396,6 +1396,10 @@ body {
   margin: 0;
 }
 
+.modal.modal-wide {
+  max-width: 550px;
+}
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -1493,4 +1497,275 @@ body {
 .modal-footer .btn {
   padding: 8px 16px;
   font-size: 0.85rem;
+}
+
+/* ====== COMBAT ACTION MODAL ====== */
+.action-type-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.action-type-btn {
+  padding: 8px 12px;
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.action-type-btn:hover {
+  border-color: var(--gold);
+  color: var(--text);
+}
+
+.action-type-btn.selected {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg-dark);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.spell-options {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.spell-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.spell-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+}
+
+.option-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+/* ====== COMBAT ACTION CARDS ====== */
+.combat-action-card {
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.combat-action-card:last-child {
+  margin-bottom: 0;
+}
+
+.combat-action-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.combat-action-name {
+  font-weight: bold;
+  color: var(--gold);
+  font-size: 0.9rem;
+}
+
+.combat-action-type {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  background: var(--bg-dark);
+  border-radius: 4px;
+  color: var(--text-dim);
+}
+
+.combat-action-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.combat-action-stat {
+  display: flex;
+  gap: 4px;
+}
+
+.combat-action-stat-label {
+  color: var(--text-dim);
+}
+
+.combat-action-stat-value {
+  font-weight: bold;
+}
+
+.combat-action-badges {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.combat-action-badge {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.combat-action-uses {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.combat-action-uses-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.combat-action-uses-checkboxes {
+  display: flex;
+  gap: 4px;
+}
+
+.combat-action-use-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.combat-action-use-checkbox:hover {
+  border-color: var(--gold);
+}
+
+.combat-action-use-checkbox.used {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.combat-action-notes {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.combat-action-buttons {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.combat-action-edit,
+.combat-action-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.combat-action-edit:hover {
+  color: var(--gold);
+}
+
+.combat-action-delete:hover {
+  color: var(--danger);
+}
+
+/* Edit buttons for draggable items */
+.item-edit-btn,
+.delete-item-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.item-edit-btn:hover {
+  color: var(--gold);
+}
+
+.delete-item-btn:hover {
+  color: var(--danger);
+}
+
+.item-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+/* Simple item edit/delete */
+.simple-item-edit,
+.simple-item-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.simple-item-edit:hover {
+  color: var(--gold);
+}
+
+.simple-item-delete:hover {
+  color: var(--danger);
+}
+
+.simple-item-buttons {
+  display: flex;
+  gap: 4px;
 }

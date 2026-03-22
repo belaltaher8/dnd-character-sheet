@@ -212,8 +212,8 @@ function populateForm(char) {
   document.getElementById('weapon-proficiencies').value = char.weaponProficiencies || '';
   document.getElementById('tool-proficiencies').value = char.toolProficiencies || '';
   
-  // Weapons
-  renderWeapons(char.weapons || []);
+  // Combat Actions
+  renderCombatActions(char.combatActions || []);
   
   // Class Features
   renderDraggableItems('class-features-content', char.classFeatures || [], 'classFeatures');
@@ -318,7 +318,7 @@ function getFormData() {
     },
     weaponProficiencies: document.getElementById('weapon-proficiencies').value,
     toolProficiencies: document.getElementById('tool-proficiencies').value,
-    weapons: currentCharacter?.weapons || [],
+    combatActions: currentCharacter?.combatActions || [],
     classFeatures: currentCharacter?.classFeatures || [],
     speciesTraits: currentCharacter?.speciesTraits || [],
     feats: currentCharacter?.feats || [],
@@ -443,70 +443,326 @@ function updateAllCalculations() {
   updateSpellcastingStats();
 }
 
-// ====== WEAPONS ======
-function renderWeapons(weapons) {
-  const container = document.getElementById('weapons-list');
+// ====== COMBAT ACTIONS ======
+let currentActionType = 'weapon';
+let editingActionIndex = null;
+
+function renderCombatActions(actions) {
+  const container = document.getElementById('combat-actions-content');
   container.innerHTML = '';
   
-  weapons.forEach((weapon, index) => {
-    const row = document.createElement('div');
-    row.className = 'weapon-row';
-    row.innerHTML = `
-      <span>${weapon.name}</span>
-      <span>${weapon.atk}</span>
-      <span>${weapon.damage}</span>
-      <span>${weapon.notes}</span>
-      <button class="delete-weapon-btn" data-index="${index}">&times;</button>
+  if (!actions || actions.length === 0) {
+    container.innerHTML = '<div class="empty-message" style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 10px;">No combat actions yet</div>';
+    return;
+  }
+  
+  actions.forEach((action, index) => {
+    const card = document.createElement('div');
+    card.className = 'combat-action-card';
+    
+    let statsHtml = '';
+    if (action.castingTime) {
+      statsHtml += `<div class="combat-action-stat"><span class="combat-action-stat-label">Time:</span><span class="combat-action-stat-value">${action.castingTime}</span></div>`;
+    }
+    if (action.atk) {
+      statsHtml += `<div class="combat-action-stat"><span class="combat-action-stat-label">${action.type === 'spell-save' ? 'DC:' : 'Atk:'}</span><span class="combat-action-stat-value">${action.atk}</span></div>`;
+    }
+    if (action.damage) {
+      statsHtml += `<div class="combat-action-stat"><span class="combat-action-stat-label">Dmg:</span><span class="combat-action-stat-value">${action.damage}</span></div>`;
+    }
+    if (action.range) {
+      statsHtml += `<div class="combat-action-stat"><span class="combat-action-stat-label">Range:</span><span class="combat-action-stat-value">${action.range}</span></div>`;
+    }
+    
+    let badgesHtml = '';
+    if (action.concentration || action.ritual || action.materials) {
+      badgesHtml = '<div class="combat-action-badges">';
+      if (action.concentration) badgesHtml += '<span class="combat-action-badge">C</span>';
+      if (action.ritual) badgesHtml += '<span class="combat-action-badge">R</span>';
+      if (action.materials) badgesHtml += '<span class="combat-action-badge">M</span>';
+      badgesHtml += '</div>';
+    }
+    
+    let usesHtml = '';
+    if (action.type === 'action' && action.uses > 0) {
+      usesHtml = `
+        <div class="combat-action-uses">
+          <span class="combat-action-uses-label">Uses:</span>
+          <div class="combat-action-uses-checkboxes" data-index="${index}">
+            ${Array(action.uses).fill(0).map((_, i) => 
+              `<div class="combat-action-use-checkbox${action.usedUses?.includes(i) ? ' used' : ''}" data-use-index="${i}"></div>`
+            ).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    const typeLabel = {
+      'weapon': 'Weapon',
+      'spell-attack': 'Spell Atk',
+      'spell-save': 'Spell Save',
+      'action': 'Action'
+    }[action.type] || action.type;
+    
+    card.innerHTML = `
+      <div class="combat-action-header">
+        <span class="combat-action-name">${action.name}</span>
+        <span class="combat-action-type">${typeLabel}</span>
+      </div>
+      <div class="combat-action-stats">${statsHtml}</div>
+      ${badgesHtml}
+      ${usesHtml}
+      ${action.notes ? `<div class="combat-action-notes">${action.notes}</div>` : ''}
+      <div class="combat-action-buttons">
+        <button class="combat-action-edit" data-index="${index}">✎</button>
+        <button class="combat-action-delete" data-index="${index}">&times;</button>
+      </div>
     `;
-    container.appendChild(row);
+    
+    container.appendChild(card);
+  });
+  
+  // Add edit listeners
+  container.querySelectorAll('.combat-action-edit').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editCombatAction(parseInt(e.target.dataset.index));
+    });
   });
   
   // Add delete listeners
-  container.querySelectorAll('.delete-weapon-btn').forEach(btn => {
+  container.querySelectorAll('.combat-action-delete').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const index = parseInt(e.target.dataset.index);
-      deleteWeapon(index);
+      e.stopPropagation();
+      confirmDeleteCombatAction(parseInt(e.target.dataset.index));
+    });
+  });
+  
+  // Add use checkbox listeners
+  container.querySelectorAll('.combat-action-use-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('click', (e) => {
+      const actionIndex = parseInt(e.target.closest('.combat-action-uses-checkboxes').dataset.index);
+      const useIndex = parseInt(e.target.dataset.useIndex);
+      toggleCombatActionUse(actionIndex, useIndex);
     });
   });
 }
 
-function deleteWeapon(index) {
-  if (!currentCharacter.weapons) return;
-  currentCharacter.weapons.splice(index, 1);
-  renderWeapons(currentCharacter.weapons);
+function toggleCombatActionUse(actionIndex, useIndex) {
+  const action = currentCharacter.combatActions?.[actionIndex];
+  if (!action) return;
+  
+  if (!action.usedUses) action.usedUses = [];
+  
+  const idx = action.usedUses.indexOf(useIndex);
+  if (idx === -1) {
+    action.usedUses.push(useIndex);
+  } else {
+    action.usedUses.splice(idx, 1);
+  }
+  
+  renderCombatActions(currentCharacter.combatActions);
 }
 
-function openWeaponModal() {
-  document.getElementById('weapon-name').value = '';
-  document.getElementById('weapon-atk').value = '';
-  document.getElementById('weapon-damage').value = '';
-  document.getElementById('weapon-notes').value = '';
-  document.getElementById('weapon-modal').classList.add('active');
+function confirmDeleteCombatAction(index) {
+  const action = currentCharacter.combatActions?.[index];
+  if (!action) return;
+  
+  pendingDelete = { key: 'combatActions', index };
+  document.getElementById('delete-confirm-message').textContent = 
+    `Are you sure you want to delete "${action.name}"?`;
+  document.getElementById('delete-confirm-modal').classList.add('active');
+}
+
+function openCombatActionModal() {
+  editingActionIndex = null;
+  document.getElementById('action-name').value = '';
+  document.getElementById('action-casting-time').value = 'Action';
+  document.getElementById('action-atk').value = '';
+  document.getElementById('action-damage').value = '';
+  document.getElementById('action-range').value = '';
+  document.getElementById('action-uses').value = '1';
+  document.getElementById('action-notes').value = '';
+  document.getElementById('action-concentration').checked = false;
+  document.getElementById('action-ritual').checked = false;
+  document.getElementById('action-materials').checked = false;
+  
+  // Reset to weapon type
+  currentActionType = 'weapon';
+  document.querySelectorAll('.action-type-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.type === 'weapon');
+  });
+  updateCombatActionModalFields();
+  
+  document.querySelector('#combat-action-modal .modal-header h3').textContent = 'Add Combat Action';
+  document.getElementById('save-combat-action-btn').textContent = 'Add Action';
+  document.getElementById('combat-action-modal').classList.add('active');
+}
+
+function editCombatAction(index) {
+  const action = currentCharacter.combatActions?.[index];
+  if (!action) return;
+  
+  editingActionIndex = index;
+  currentActionType = action.type;
+  
+  document.getElementById('action-name').value = action.name || '';
+  document.getElementById('action-casting-time').value = action.castingTime || 'Action';
+  document.getElementById('action-atk').value = action.atk || '';
+  document.getElementById('action-damage').value = action.damage || '';
+  document.getElementById('action-range').value = action.range || '';
+  document.getElementById('action-uses').value = action.uses || 1;
+  document.getElementById('action-notes').value = action.notes || '';
+  document.getElementById('action-concentration').checked = action.concentration || false;
+  document.getElementById('action-ritual').checked = action.ritual || false;
+  document.getElementById('action-materials').checked = action.materials || false;
+  
+  document.querySelectorAll('.action-type-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.type === action.type);
+  });
+  updateCombatActionModalFields();
+  
+  document.querySelector('#combat-action-modal .modal-header h3').textContent = 'Edit Combat Action';
+  document.getElementById('save-combat-action-btn').textContent = 'Save Changes';
+  document.getElementById('combat-action-modal').classList.add('active');
+}
+
+function updateCombatActionModalFields() {
+  const castingTimeGroup = document.getElementById('casting-time-group');
+  const atkBonusGroup = document.getElementById('atk-bonus-group');
+  const atkBonusLabel = document.getElementById('atk-bonus-label');
+  const damageGroup = document.getElementById('damage-group');
+  const rangeGroup = document.getElementById('range-group');
+  const usesGroup = document.getElementById('uses-group');
+  const spellOptionsGroup = document.getElementById('spell-options-group');
+  const atkInput = document.getElementById('action-atk');
+  const castingTimeInput = document.getElementById('action-casting-time');
+  
+  // Show/hide based on type
+  switch (currentActionType) {
+    case 'weapon':
+      castingTimeGroup.style.display = 'block';
+      castingTimeInput.value = 'Action';
+      castingTimeInput.readOnly = true;
+      atkBonusGroup.style.display = 'block';
+      atkBonusLabel.textContent = 'Attack Bonus';
+      atkInput.placeholder = 'e.g., +5';
+      atkInput.readOnly = false;
+      damageGroup.style.display = 'block';
+      rangeGroup.style.display = 'block';
+      usesGroup.style.display = 'none';
+      spellOptionsGroup.style.display = 'none';
+      break;
+    case 'spell-attack':
+      castingTimeGroup.style.display = 'block';
+      castingTimeInput.readOnly = false;
+      atkBonusGroup.style.display = 'block';
+      atkBonusLabel.textContent = 'Attack Bonus (auto)';
+      atkInput.value = getSpellAttackBonus();
+      atkInput.readOnly = true;
+      damageGroup.style.display = 'block';
+      rangeGroup.style.display = 'block';
+      usesGroup.style.display = 'none';
+      spellOptionsGroup.style.display = 'block';
+      break;
+    case 'spell-save':
+      castingTimeGroup.style.display = 'block';
+      castingTimeInput.readOnly = false;
+      atkBonusGroup.style.display = 'block';
+      atkBonusLabel.textContent = 'Spell Save DC (auto)';
+      atkInput.value = getSpellSaveDC();
+      atkInput.readOnly = true;
+      damageGroup.style.display = 'block';
+      rangeGroup.style.display = 'block';
+      usesGroup.style.display = 'none';
+      spellOptionsGroup.style.display = 'block';
+      break;
+    case 'action':
+      castingTimeGroup.style.display = 'block';
+      castingTimeInput.readOnly = false;
+      atkBonusGroup.style.display = 'none';
+      damageGroup.style.display = 'none';
+      rangeGroup.style.display = 'none';
+      usesGroup.style.display = 'block';
+      spellOptionsGroup.style.display = 'none';
+      break;
+  }
+}
+
+function getSpellAttackBonus() {
+  const ability = currentCharacter?.spellcastingAbility;
+  if (!ability) return '—';
+  const abilityScore = parseInt(abilityInputs[ability]?.value) || 10;
+  const spellMod = calculateModifier(abilityScore);
+  const profBonus = parseInt(document.getElementById('proficiency-bonus').value) || 2;
+  return formatModifier(profBonus + spellMod);
+}
+
+function getSpellSaveDC() {
+  const ability = currentCharacter?.spellcastingAbility;
+  if (!ability) return '—';
+  const abilityScore = parseInt(abilityInputs[ability]?.value) || 10;
+  const spellMod = calculateModifier(abilityScore);
+  const profBonus = parseInt(document.getElementById('proficiency-bonus').value) || 2;
+  return String(8 + profBonus + spellMod);
+}
+
+function saveCombatAction() {
+  const action = {
+    type: currentActionType,
+    name: document.getElementById('action-name').value,
+    castingTime: document.getElementById('action-casting-time').value,
+    notes: document.getElementById('action-notes').value,
+  };
+  
+  if (!action.name) return;
+  
+  if (currentActionType !== 'action') {
+    action.atk = document.getElementById('action-atk').value;
+    action.damage = document.getElementById('action-damage').value;
+    action.range = document.getElementById('action-range').value;
+  }
+  
+  if (currentActionType === 'spell-attack' || currentActionType === 'spell-save') {
+    action.concentration = document.getElementById('action-concentration').checked;
+    action.ritual = document.getElementById('action-ritual').checked;
+    action.materials = document.getElementById('action-materials').checked;
+  }
+  
+  if (currentActionType === 'action') {
+    action.uses = parseInt(document.getElementById('action-uses').value) || 0;
+    // Preserve usedUses when editing
+    if (editingActionIndex !== null && currentCharacter.combatActions[editingActionIndex]?.usedUses) {
+      action.usedUses = currentCharacter.combatActions[editingActionIndex].usedUses.filter(i => i < action.uses);
+    } else {
+      action.usedUses = [];
+    }
+  }
+  
+  if (!currentCharacter.combatActions) {
+    currentCharacter.combatActions = [];
+  }
+  
+  if (editingActionIndex !== null) {
+    currentCharacter.combatActions[editingActionIndex] = action;
+  } else {
+    currentCharacter.combatActions.push(action);
+  }
+  
+  renderCombatActions(currentCharacter.combatActions);
+  closeModal('combat-action-modal');
+  editingActionIndex = null;
 }
 
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('active');
 }
 
-function saveWeapon() {
-  const weapon = {
-    name: document.getElementById('weapon-name').value,
-    atk: document.getElementById('weapon-atk').value,
-    damage: document.getElementById('weapon-damage').value,
-    notes: document.getElementById('weapon-notes').value,
-  };
-  
-  if (!weapon.name) return;
-  
-  if (!currentCharacter.weapons) {
-    currentCharacter.weapons = [];
-  }
-  currentCharacter.weapons.push(weapon);
-  renderWeapons(currentCharacter.weapons);
-  closeModal('weapon-modal');
-}
-
 // ====== CLASS FEATURES ======
+// Track editing state for different item types
+let editingItemIndex = null;
+let editingItemKey = null;
+
 // Generic render function for draggable items with title/description (class features, species traits, feats)
 function renderDraggableItems(containerId, items, dataKey) {
   const container = document.getElementById(containerId);
@@ -522,7 +778,10 @@ function renderDraggableItems(containerId, items, dataKey) {
       <span class="drag-handle">⋮⋮</span>
       <div class="item-header">
         <span class="item-title">${item.title}</span>
-        <button class="delete-item-btn" data-index="${index}" data-key="${dataKey}">&times;</button>
+        <div class="item-buttons">
+          <button class="item-edit-btn" data-index="${index}" data-key="${dataKey}">✎</button>
+          <button class="delete-item-btn" data-index="${index}" data-key="${dataKey}">&times;</button>
+        </div>
       </div>
       <div class="item-desc">${item.description || ''}</div>
     `;
@@ -534,6 +793,16 @@ function renderDraggableItems(containerId, items, dataKey) {
     el.addEventListener('dragover', handleDragOver);
     el.addEventListener('drop', handleDrop);
     el.addEventListener('dragleave', handleDragLeave);
+  });
+  
+  // Add edit listeners
+  container.querySelectorAll('.item-edit-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const index = parseInt(e.target.dataset.index);
+      const key = e.target.dataset.key;
+      editDraggableItem(key, index);
+    });
   });
   
   // Add delete listeners
@@ -560,7 +829,10 @@ function renderSimpleItems(containerId, items, dataKey) {
     el.dataset.key = dataKey;
     el.innerHTML = `
       <span class="item-name"><span class="drag-handle">⋮⋮</span>${item}</span>
-      <button class="delete-item-btn" data-index="${index}" data-key="${dataKey}">&times;</button>
+      <div class="simple-item-buttons">
+        <button class="simple-item-edit" data-index="${index}" data-key="${dataKey}">✎</button>
+        <button class="simple-item-delete" data-index="${index}" data-key="${dataKey}">&times;</button>
+      </div>
     `;
     container.appendChild(el);
     
@@ -572,8 +844,18 @@ function renderSimpleItems(containerId, items, dataKey) {
     el.addEventListener('dragleave', handleDragLeave);
   });
   
+  // Add edit listeners
+  container.querySelectorAll('.simple-item-edit').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const index = parseInt(e.target.dataset.index);
+      const key = e.target.dataset.key;
+      editSimpleItem(key, index);
+    });
+  });
+  
   // Add delete listeners
-  container.querySelectorAll('.delete-item-btn').forEach(btn => {
+  container.querySelectorAll('.simple-item-delete').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const index = parseInt(e.target.dataset.index);
@@ -680,7 +962,9 @@ function executeDelete() {
   
   currentCharacter[key].splice(index, 1);
   
-  if (key === 'languages' || key === 'resistances') {
+  if (key === 'combatActions') {
+    renderCombatActions(currentCharacter[key]);
+  } else if (key === 'languages' || key === 'resistances') {
     renderSimpleItems(getContainerId(key), currentCharacter[key], key);
   } else {
     renderDraggableItems(getContainerId(key), currentCharacter[key], key);
@@ -694,10 +978,69 @@ function deleteItem(key, index) {
   confirmDeleteItem(key, index);
 }
 
+// Edit functions for different item types
+function editDraggableItem(key, index) {
+  const item = currentCharacter[key]?.[index];
+  if (!item) return;
+  
+  editingItemKey = key;
+  editingItemIndex = index;
+  
+  if (key === 'classFeatures') {
+    document.getElementById('feature-title').value = item.title || '';
+    document.getElementById('feature-description').value = item.description || '';
+    document.querySelector('#class-feature-modal .modal-header h3').textContent = 'Edit Class Feature';
+    document.getElementById('save-class-feature-btn').textContent = 'Save Changes';
+    document.getElementById('class-feature-modal').classList.add('active');
+  } else if (key === 'speciesTraits') {
+    document.getElementById('species-trait-title').value = item.title || '';
+    document.getElementById('species-trait-description').value = item.description || '';
+    document.querySelector('#species-trait-modal .modal-header h3').textContent = 'Edit Species Trait';
+    document.getElementById('save-species-trait-btn').textContent = 'Save Changes';
+    document.getElementById('species-trait-modal').classList.add('active');
+  } else if (key === 'feats') {
+    document.getElementById('feat-title').value = item.title || '';
+    document.getElementById('feat-description').value = item.description || '';
+    document.querySelector('#feat-modal .modal-header h3').textContent = 'Edit Feat';
+    document.getElementById('save-feat-btn').textContent = 'Save Changes';
+    document.getElementById('feat-modal').classList.add('active');
+  } else if (key === 'equipment') {
+    document.getElementById('equipment-title').value = item.title || '';
+    document.getElementById('equipment-description').value = item.description || '';
+    document.querySelector('#equipment-modal .modal-header h3').textContent = 'Edit Equipment';
+    document.getElementById('save-equipment-btn').textContent = 'Save Changes';
+    document.getElementById('equipment-modal').classList.add('active');
+  }
+}
+
+function editSimpleItem(key, index) {
+  const item = currentCharacter[key]?.[index];
+  if (!item) return;
+  
+  editingItemKey = key;
+  editingItemIndex = index;
+  
+  if (key === 'languages') {
+    document.getElementById('language-name').value = item;
+    document.querySelector('#language-modal .modal-header h3').textContent = 'Edit Language';
+    document.getElementById('save-language-btn').textContent = 'Save Changes';
+    document.getElementById('language-modal').classList.add('active');
+  } else if (key === 'resistances') {
+    document.getElementById('resistance-name').value = item;
+    document.querySelector('#resistance-modal .modal-header h3').textContent = 'Edit Resistance';
+    document.getElementById('save-resistance-btn').textContent = 'Save Changes';
+    document.getElementById('resistance-modal').classList.add('active');
+  }
+}
+
 // ====== MODALS ======
 function openClassFeatureModal() {
+  editingItemKey = null;
+  editingItemIndex = null;
   document.getElementById('feature-title').value = '';
   document.getElementById('feature-description').value = '';
+  document.querySelector('#class-feature-modal .modal-header h3').textContent = 'Add Class Feature';
+  document.getElementById('save-class-feature-btn').textContent = 'Add Feature';
   document.getElementById('class-feature-modal').classList.add('active');
 }
 
@@ -712,9 +1055,17 @@ function saveClassFeature() {
   if (!currentCharacter.classFeatures) {
     currentCharacter.classFeatures = [];
   }
-  currentCharacter.classFeatures.push(feature);
+  
+  if (editingItemKey === 'classFeatures' && editingItemIndex !== null) {
+    currentCharacter.classFeatures[editingItemIndex] = feature;
+  } else {
+    currentCharacter.classFeatures.push(feature);
+  }
+  
   renderDraggableItems('class-features-content', currentCharacter.classFeatures, 'classFeatures');
   closeModal('class-feature-modal');
+  editingItemKey = null;
+  editingItemIndex = null;
 }
 
 function addBulletPoint(textareaId) {
@@ -730,8 +1081,12 @@ function addBulletPoint(textareaId) {
 
 // Species Traits Modal
 function openSpeciesTraitModal() {
+  editingItemKey = null;
+  editingItemIndex = null;
   document.getElementById('species-trait-title').value = '';
   document.getElementById('species-trait-description').value = '';
+  document.querySelector('#species-trait-modal .modal-header h3').textContent = 'Add Species Trait';
+  document.getElementById('save-species-trait-btn').textContent = 'Add Trait';
   document.getElementById('species-trait-modal').classList.add('active');
 }
 
@@ -746,15 +1101,27 @@ function saveSpeciesTrait() {
   if (!currentCharacter.speciesTraits) {
     currentCharacter.speciesTraits = [];
   }
-  currentCharacter.speciesTraits.push(trait);
+  
+  if (editingItemKey === 'speciesTraits' && editingItemIndex !== null) {
+    currentCharacter.speciesTraits[editingItemIndex] = trait;
+  } else {
+    currentCharacter.speciesTraits.push(trait);
+  }
+  
   renderDraggableItems('species-traits-content', currentCharacter.speciesTraits, 'speciesTraits');
   closeModal('species-trait-modal');
+  editingItemKey = null;
+  editingItemIndex = null;
 }
 
 // Feat Modal
 function openFeatModal() {
+  editingItemKey = null;
+  editingItemIndex = null;
   document.getElementById('feat-title').value = '';
   document.getElementById('feat-description').value = '';
+  document.querySelector('#feat-modal .modal-header h3').textContent = 'Add Feat';
+  document.getElementById('save-feat-btn').textContent = 'Add Feat';
   document.getElementById('feat-modal').classList.add('active');
 }
 
@@ -769,14 +1136,26 @@ function saveFeat() {
   if (!currentCharacter.feats) {
     currentCharacter.feats = [];
   }
-  currentCharacter.feats.push(feat);
+  
+  if (editingItemKey === 'feats' && editingItemIndex !== null) {
+    currentCharacter.feats[editingItemIndex] = feat;
+  } else {
+    currentCharacter.feats.push(feat);
+  }
+  
   renderDraggableItems('feats-content', currentCharacter.feats, 'feats');
   closeModal('feat-modal');
+  editingItemKey = null;
+  editingItemIndex = null;
 }
 
 // Language Modal
 function openLanguageModal() {
+  editingItemKey = null;
+  editingItemIndex = null;
   document.getElementById('language-name').value = '';
+  document.querySelector('#language-modal .modal-header h3').textContent = 'Add Language';
+  document.getElementById('save-language-btn').textContent = 'Add Language';
   document.getElementById('language-modal').classList.add('active');
 }
 
@@ -788,14 +1167,26 @@ function saveLanguage() {
   if (!currentCharacter.languages) {
     currentCharacter.languages = [];
   }
-  currentCharacter.languages.push(name);
+  
+  if (editingItemKey === 'languages' && editingItemIndex !== null) {
+    currentCharacter.languages[editingItemIndex] = name;
+  } else {
+    currentCharacter.languages.push(name);
+  }
+  
   renderSimpleItems('languages-content', currentCharacter.languages, 'languages');
   closeModal('language-modal');
+  editingItemKey = null;
+  editingItemIndex = null;
 }
 
 // Resistance Modal
 function openResistanceModal() {
+  editingItemKey = null;
+  editingItemIndex = null;
   document.getElementById('resistance-name').value = '';
+  document.querySelector('#resistance-modal .modal-header h3').textContent = 'Add Resistance';
+  document.getElementById('save-resistance-btn').textContent = 'Add Resistance';
   document.getElementById('resistance-modal').classList.add('active');
 }
 
@@ -807,15 +1198,27 @@ function saveResistance() {
   if (!currentCharacter.resistances) {
     currentCharacter.resistances = [];
   }
-  currentCharacter.resistances.push(name);
+  
+  if (editingItemKey === 'resistances' && editingItemIndex !== null) {
+    currentCharacter.resistances[editingItemIndex] = name;
+  } else {
+    currentCharacter.resistances.push(name);
+  }
+  
   renderSimpleItems('resistances-content', currentCharacter.resistances, 'resistances');
   closeModal('resistance-modal');
+  editingItemKey = null;
+  editingItemIndex = null;
 }
 
 // Equipment Modal
 function openEquipmentModal() {
+  editingItemKey = null;
+  editingItemIndex = null;
   document.getElementById('equipment-title').value = '';
   document.getElementById('equipment-description').value = '';
+  document.querySelector('#equipment-modal .modal-header h3').textContent = 'Add Equipment';
+  document.getElementById('save-equipment-btn').textContent = 'Add Equipment';
   document.getElementById('equipment-modal').classList.add('active');
 }
 
@@ -830,9 +1233,17 @@ function saveEquipment() {
   if (!currentCharacter.equipment) {
     currentCharacter.equipment = [];
   }
-  currentCharacter.equipment.push(item);
+  
+  if (editingItemKey === 'equipment' && editingItemIndex !== null) {
+    currentCharacter.equipment[editingItemIndex] = item;
+  } else {
+    currentCharacter.equipment.push(item);
+  }
+  
   renderDraggableItems('equipment-content', currentCharacter.equipment, 'equipment');
   closeModal('equipment-modal');
+  editingItemKey = null;
+  editingItemIndex = null;
 }
 
 // ====== SPELLCASTING ======
@@ -1084,9 +1495,19 @@ document.getElementById('shield-equipped').addEventListener('change', (e) => {
   // Visual feedback only - the actual AC stored is the base
 });
 
-// Weapon modal
-document.getElementById('add-weapon-btn').addEventListener('click', openWeaponModal);
-document.getElementById('save-weapon-btn').addEventListener('click', saveWeapon);
+// Combat action modal
+document.getElementById('add-combat-action-btn').addEventListener('click', openCombatActionModal);
+document.getElementById('save-combat-action-btn').addEventListener('click', saveCombatAction);
+
+// Action type selector
+document.querySelectorAll('.action-type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.action-type-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentActionType = btn.dataset.type;
+    updateCombatActionModalFields();
+  });
+});
 
 // Class feature modal
 document.getElementById('add-class-feature-btn').addEventListener('click', openClassFeatureModal);
