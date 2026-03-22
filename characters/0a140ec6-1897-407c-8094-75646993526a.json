@@ -94,6 +94,10 @@
     {
       "title": "Magical Tinkering",
       "description": "Touch tiny object. Lasts indefinitely. Max # == int. modifier:\n\n• Shine 5 ft radius bright + 5 fth radius dim\n\n• When touched, emit 5 second message that I said, heard 10 ft away \n\n• Emits odor or non-verbal sound, perceived 10ft away\n\n• Static visual effect, picture, 25 words, lines & shapes"
+    },
+    {
+      "title": "Infuse Item",
+      "description": "Can Infuse, # of infusions known & # infused items scale with level. Switch 1 infusion per level. Infuse after long rest\n\n• Repeating Shot *\n• Resistant Armor *\n• Spell Refueling Ring *\n\n\n• Repulsion Shield\n• Replicate Magic Item\n• Mind Sharpener"
     }
   ],
   "speciesTraits": [
@@ -128,6 +132,16 @@
       "description": "• Expertise in Investigation\n\n• Quick Study\n\n• Int +1"
     }
   ],
-  "languages": [],
-  "resistances": []
+  "languages": [
+    "Common",
+    "Dwarvish",
+    "Gnomish",
+    "Draconic",
+    "Celestial"
+  ],
+  "resistances": [
+    "Necrotic",
+    "Radiant",
+    "Cold"
+  ]
 }

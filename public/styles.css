@@ -1024,6 +1024,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  align-items: start;
   transition: margin 0.2s ease;
 }
 
@@ -1229,6 +1230,19 @@ body {
   max-width: 450px;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+.modal.modal-small {
+  max-width: 320px;
+}
+
+.modal.modal-small .modal-body {
+  text-align: center;
+}
+
+.modal.modal-small .modal-body p {
+  color: var(--text);
+  margin: 0;
 }
 
 .modal-header {

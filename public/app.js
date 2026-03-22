@@ -638,8 +638,28 @@ function getContainerId(key) {
   return map[key];
 }
 
-function deleteItem(key, index) {
-  if (!currentCharacter[key]) return;
+// Pending delete info for confirmation
+let pendingDelete = { key: null, index: null };
+
+function confirmDeleteItem(key, index) {
+  pendingDelete = { key, index };
+  const itemName = getItemName(key, index);
+  document.getElementById('delete-confirm-message').textContent = 
+    `Are you sure you want to delete "${itemName}"?`;
+  document.getElementById('delete-confirm-modal').classList.add('active');
+}
+
+function getItemName(key, index) {
+  const item = currentCharacter[key]?.[index];
+  if (!item) return 'this item';
+  if (typeof item === 'string') return item;
+  return item.title || item.name || 'this item';
+}
+
+function executeDelete() {
+  const { key, index } = pendingDelete;
+  if (!key || index === null || !currentCharacter[key]) return;
+  
   currentCharacter[key].splice(index, 1);
   
   if (key === 'languages' || key === 'resistances') {
@@ -647,6 +667,13 @@ function deleteItem(key, index) {
   } else {
     renderDraggableItems(getContainerId(key), currentCharacter[key], key);
   }
+  
+  closeModal('delete-confirm-modal');
+  pendingDelete = { key: null, index: null };
+}
+
+function deleteItem(key, index) {
+  confirmDeleteItem(key, index);
 }
 
 // ====== MODALS ======
@@ -915,6 +942,9 @@ document.getElementById('save-language-btn').addEventListener('click', saveLangu
 // Resistance modal
 document.getElementById('add-resistance-btn').addEventListener('click', openResistanceModal);
 document.getElementById('save-resistance-btn').addEventListener('click', saveResistance);
+
+// Delete confirmation
+document.getElementById('confirm-delete-btn').addEventListener('click', executeDelete);
 
 // Remaining placeholders (+ buttons don't do anything yet)
 document.getElementById('add-equipment-btn').addEventListener('click', () => {
