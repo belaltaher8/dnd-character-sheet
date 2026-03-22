@@ -39,24 +39,24 @@
     "charisma": false
   },
   "skillProficiencies": {
-    "athletics": false,
-    "acrobatics": false,
-    "sleight-of-hand": false,
-    "stealth": false,
-    "arcana": true,
-    "history": true,
-    "investigation": true,
-    "nature": false,
-    "religion": false,
-    "animal-handling": false,
-    "insight": false,
-    "medicine": false,
-    "perception": true,
-    "survival": false,
-    "deception": false,
-    "intimidation": false,
-    "performance": false,
-    "persuasion": false
+    "athletics": 0,
+    "acrobatics": 0,
+    "sleight-of-hand": 0,
+    "stealth": 0,
+    "arcana": 1,
+    "history": 1,
+    "investigation": 2,
+    "nature": 0,
+    "religion": 0,
+    "animal-handling": 0,
+    "insight": 0,
+    "medicine": 0,
+    "perception": 1,
+    "survival": 0,
+    "deception": 0,
+    "intimidation": 0,
+    "performance": 0,
+    "persuasion": 0
   },
   "armorTraining": {
     "light": true,
@@ -78,8 +78,56 @@
     {
       "title": "Battle Ready",
       "description": "Apply Int. Modifier for atk & dmg rolls with a magic weapon."
+    },
+    {
+      "title": "The Right Tool for the Job",
+      "description": "1hr to create one set of any artisan's tools (can be used during short or long rest)"
+    },
+    {
+      "title": "Flash of Genius",
+      "description": "You or a creature within 30ft can add your int. modifier to an ability check or saving throw. Uses Reaction. Can cast # of times == to int. modifier. Replenish after long rest."
+    },
+    {
+      "title": "Tool Expertise",
+      "description": "Prof bonus is now doubled for any ability check you make that uses your proficiency with a tool."
+    },
+    {
+      "title": "Magical Tinkering",
+      "description": "Touch tiny object. Lasts indefinitely. Max # == int. modifier:\n\n• Shine 5 ft radius bright + 5 fth radius dim\n\n• When touched, emit 5 second message that I said, heard 10 ft away \n\n• Emits odor or non-verbal sound, perceived 10ft away\n\n• Static visual effect, picture, 25 words, lines & shapes"
     }
   ],
-  "speciesTraits": [],
-  "feats": []
+  "speciesTraits": [
+    {
+      "title": "Darkvision",
+      "description": "See dim light in darkness, bright life in dim (60 ft)"
+    },
+    {
+      "title": "Celestial Resistance",
+      "description": "Resists Necrotic & Radiant dmg"
+    },
+    {
+      "title": "Light Bearer",
+      "description": "Can cast cantrip Light"
+    },
+    {
+      "title": "Healing Hands",
+      "description": "Once per long rest, can cast Healing Hands"
+    },
+    {
+      "title": "Celestial Revelation (Heavenly Wings)",
+      "description": "For a bonus action, transform for 1 min, once per long rest\n\n• when you deal dmg. (once per turn) deal extra Radiant damage == prof. bonus\n\n• grants flight"
+    }
+  ],
+  "feats": [
+    {
+      "title": "Magic Initiate (Wizard)",
+      "description": "• Learns 2 cantrips & 1 lvl 1 Wizard spell (dedicated spell slot to cast this)\n\n• Swap one of the chosen cantrips or spell once per level"
+    },
+    {
+      "title": "Keen Mind",
+      "description": "• Expertise in Investigation\n\n• Quick Study\n\n• Int +1"
+    }
+  ],
+  "languages": [],
+  "resistances": []
 }

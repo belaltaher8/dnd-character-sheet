@@ -190,11 +190,17 @@ function populateForm(char) {
   saveProfCheckboxes.wis.checked = char.saveProficiencies?.wisdom || false;
   saveProfCheckboxes.cha.checked = char.saveProficiencies?.charisma || false;
   
-  // Skill proficiencies
+  // Skill proficiencies (3-state: 0=none, 1=proficient, 2=expertise)
   Object.keys(skillAbilityMap).forEach(skill => {
-    const checkbox = document.getElementById(`${skill}-prof`);
-    if (checkbox) {
-      checkbox.checked = char.skillProficiencies?.[skill] || false;
+    const toggle = document.getElementById(`${skill}-prof`);
+    if (toggle) {
+      const state = char.skillProficiencies?.[skill] || 0;
+      toggle.classList.remove('proficient', 'expertise');
+      if (state === 1) {
+        toggle.classList.add('proficient');
+      } else if (state === 2) {
+        toggle.classList.add('expertise');
+      }
     }
   });
   
@@ -210,7 +216,19 @@ function populateForm(char) {
   renderWeapons(char.weapons || []);
   
   // Class Features
-  renderClassFeatures(char.classFeatures || []);
+  renderDraggableItems('class-features-content', char.classFeatures || [], 'classFeatures');
+  
+  // Species Traits
+  renderDraggableItems('species-traits-content', char.speciesTraits || [], 'speciesTraits');
+  
+  // Feats
+  renderDraggableItems('feats-content', char.feats || [], 'feats');
+  
+  // Languages
+  renderSimpleItems('languages-content', char.languages || [], 'languages');
+  
+  // Resistances
+  renderSimpleItems('resistances-content', char.resistances || [], 'resistances');
   
   updateAllCalculations();
 }
@@ -226,12 +244,18 @@ function getFormData() {
   if (document.getElementById('death-fail-2').checked) deathFailures++;
   if (document.getElementById('death-fail-3').checked) deathFailures++;
   
-  // Collect skill proficiencies
+  // Collect skill proficiencies (3-state: 0=none, 1=proficient, 2=expertise)
   const skillProficiencies = {};
   Object.keys(skillAbilityMap).forEach(skill => {
-    const checkbox = document.getElementById(`${skill}-prof`);
-    if (checkbox) {
-      skillProficiencies[skill] = checkbox.checked;
+    const toggle = document.getElementById(`${skill}-prof`);
+    if (toggle) {
+      if (toggle.classList.contains('expertise')) {
+        skillProficiencies[skill] = 2;
+      } else if (toggle.classList.contains('proficient')) {
+        skillProficiencies[skill] = 1;
+      } else {
+        skillProficiencies[skill] = 0;
+      }
     }
   });
   
@@ -285,6 +309,8 @@ function getFormData() {
     classFeatures: currentCharacter?.classFeatures || [],
     speciesTraits: currentCharacter?.speciesTraits || [],
     feats: currentCharacter?.feats || [],
+    languages: currentCharacter?.languages || [],
+    resistances: currentCharacter?.resistances || [],
   };
 }
 
@@ -303,16 +329,49 @@ function updateSavingThrow(ability) {
   saveValueDisplays[ability].textContent = formatModifier(total);
 }
 
+function getSkillProficiencyState(skill) {
+  const toggle = document.getElementById(`${skill}-prof`);
+  if (!toggle) return 0;
+  if (toggle.classList.contains('expertise')) return 2;
+  if (toggle.classList.contains('proficient')) return 1;
+  return 0;
+}
+
 function updateSkill(skill) {
   const ability = skillAbilityMap[skill];
   const mod = calculateModifier(parseInt(abilityInputs[ability].value) || 10);
   const profBonus = parseInt(document.getElementById('proficiency-bonus').value) || 2;
-  const checkbox = document.getElementById(`${skill}-prof`);
   const valueDisplay = document.getElementById(`${skill}-val`);
-  if (checkbox && valueDisplay) {
-    const isProficient = checkbox.checked;
-    const total = mod + (isProficient ? profBonus : 0);
+  const state = getSkillProficiencyState(skill);
+  
+  if (valueDisplay) {
+    let total = mod;
+    if (state === 1) {
+      total += profBonus; // Proficient
+    } else if (state === 2) {
+      total += profBonus * 2; // Expertise
+    }
     valueDisplay.textContent = formatModifier(total);
+  }
+}
+
+function cycleSkillProficiency(skill) {
+  const toggle = document.getElementById(`${skill}-prof`);
+  if (!toggle) return;
+  
+  // Cycle: none -> proficient -> expertise -> none
+  if (toggle.classList.contains('expertise')) {
+    toggle.classList.remove('expertise');
+  } else if (toggle.classList.contains('proficient')) {
+    toggle.classList.remove('proficient');
+    toggle.classList.add('expertise');
+  } else {
+    toggle.classList.add('proficient');
+  }
+  
+  updateSkill(skill);
+  if (skill === 'perception') {
+    updatePassivePerception();
   }
 }
 
@@ -324,9 +383,13 @@ function updateInitiative() {
 function updatePassivePerception() {
   const wisMod = calculateModifier(parseInt(abilityInputs.wis.value) || 10);
   const profBonus = parseInt(document.getElementById('proficiency-bonus').value) || 2;
-  const perceptionProf = document.getElementById('perception-prof');
-  const isProficient = perceptionProf ? perceptionProf.checked : false;
-  const total = 10 + wisMod + (isProficient ? profBonus : 0);
+  const state = getSkillProficiencyState('perception');
+  let total = 10 + wisMod;
+  if (state === 1) {
+    total += profBonus;
+  } else if (state === 2) {
+    total += profBonus * 2;
+  }
   document.getElementById('passive-perception').textContent = total;
 }
 
@@ -427,38 +490,166 @@ function saveWeapon() {
 }
 
 // ====== CLASS FEATURES ======
-function renderClassFeatures(features) {
-  const container = document.getElementById('class-features-content');
+// Generic render function for draggable items with title/description (class features, species traits, feats)
+function renderDraggableItems(containerId, items, dataKey) {
+  const container = document.getElementById(containerId);
   container.innerHTML = '';
   
-  features.forEach((feature, index) => {
-    const item = document.createElement('div');
-    item.className = 'class-feature-item';
-    item.innerHTML = `
-      <div class="feature-item-header">
-        <span class="feature-item-title">${feature.title}</span>
-        <button class="delete-feature-btn" data-index="${index}">&times;</button>
+  items.forEach((item, index) => {
+    const el = document.createElement('div');
+    el.className = 'draggable-item';
+    el.draggable = true;
+    el.dataset.index = index;
+    el.dataset.key = dataKey;
+    el.innerHTML = `
+      <span class="drag-handle">⋮⋮</span>
+      <div class="item-header">
+        <span class="item-title">${item.title}</span>
+        <button class="delete-item-btn" data-index="${index}" data-key="${dataKey}">&times;</button>
       </div>
-      <div class="feature-item-desc">${feature.description}</div>
+      <div class="item-desc">${item.description || ''}</div>
     `;
-    container.appendChild(item);
+    container.appendChild(el);
+    
+    // Drag events
+    el.addEventListener('dragstart', handleDragStart);
+    el.addEventListener('dragend', handleDragEnd);
+    el.addEventListener('dragover', handleDragOver);
+    el.addEventListener('drop', handleDrop);
+    el.addEventListener('dragleave', handleDragLeave);
   });
   
   // Add delete listeners
-  container.querySelectorAll('.delete-feature-btn').forEach(btn => {
+  container.querySelectorAll('.delete-item-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const index = parseInt(e.target.dataset.index);
-      deleteClassFeature(index);
+      const key = e.target.dataset.key;
+      deleteItem(key, index);
     });
   });
 }
 
-function deleteClassFeature(index) {
-  if (!currentCharacter.classFeatures) return;
-  currentCharacter.classFeatures.splice(index, 1);
-  renderClassFeatures(currentCharacter.classFeatures);
+// Render simple items (languages, resistances) - single field, no description
+function renderSimpleItems(containerId, items, dataKey) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  
+  items.forEach((item, index) => {
+    const el = document.createElement('div');
+    el.className = 'simple-item';
+    el.draggable = true;
+    el.dataset.index = index;
+    el.dataset.key = dataKey;
+    el.innerHTML = `
+      <span class="item-name"><span class="drag-handle">⋮⋮</span>${item}</span>
+      <button class="delete-item-btn" data-index="${index}" data-key="${dataKey}">&times;</button>
+    `;
+    container.appendChild(el);
+    
+    // Drag events
+    el.addEventListener('dragstart', handleDragStart);
+    el.addEventListener('dragend', handleDragEnd);
+    el.addEventListener('dragover', handleDragOver);
+    el.addEventListener('drop', handleDrop);
+    el.addEventListener('dragleave', handleDragLeave);
+  });
+  
+  // Add delete listeners
+  container.querySelectorAll('.delete-item-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const index = parseInt(e.target.dataset.index);
+      const key = e.target.dataset.key;
+      deleteItem(key, index);
+    });
+  });
 }
 
+// Drag and drop handlers
+let draggedItem = null;
+let draggedIndex = null;
+let draggedKey = null;
+
+function handleDragStart(e) {
+  draggedItem = this;
+  draggedIndex = parseInt(this.dataset.index);
+  draggedKey = this.dataset.key;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  draggedItem = null;
+  draggedIndex = null;
+  draggedKey = null;
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  
+  // Only allow drop on same type
+  if (this.dataset.key !== draggedKey) return;
+  if (this === draggedItem) return;
+  
+  this.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  
+  if (this === draggedItem) return;
+  if (this.dataset.key !== draggedKey) return;
+  
+  const targetIndex = parseInt(this.dataset.index);
+  const key = this.dataset.key;
+  
+  // Reorder the array
+  const arr = currentCharacter[key];
+  if (!arr) return;
+  
+  const [removed] = arr.splice(draggedIndex, 1);
+  arr.splice(targetIndex, 0, removed);
+  
+  // Re-render
+  if (key === 'languages' || key === 'resistances') {
+    renderSimpleItems(getContainerId(key), arr, key);
+  } else {
+    renderDraggableItems(getContainerId(key), arr, key);
+  }
+}
+
+function getContainerId(key) {
+  const map = {
+    'classFeatures': 'class-features-content',
+    'speciesTraits': 'species-traits-content',
+    'feats': 'feats-content',
+    'languages': 'languages-content',
+    'resistances': 'resistances-content',
+  };
+  return map[key];
+}
+
+function deleteItem(key, index) {
+  if (!currentCharacter[key]) return;
+  currentCharacter[key].splice(index, 1);
+  
+  if (key === 'languages' || key === 'resistances') {
+    renderSimpleItems(getContainerId(key), currentCharacter[key], key);
+  } else {
+    renderDraggableItems(getContainerId(key), currentCharacter[key], key);
+  }
+}
+
+// ====== MODALS ======
 function openClassFeatureModal() {
   document.getElementById('feature-title').value = '';
   document.getElementById('feature-description').value = '';
@@ -477,12 +668,12 @@ function saveClassFeature() {
     currentCharacter.classFeatures = [];
   }
   currentCharacter.classFeatures.push(feature);
-  renderClassFeatures(currentCharacter.classFeatures);
+  renderDraggableItems('class-features-content', currentCharacter.classFeatures, 'classFeatures');
   closeModal('class-feature-modal');
 }
 
-function addBulletPoint() {
-  const textarea = document.getElementById('feature-description');
+function addBulletPoint(textareaId) {
+  const textarea = document.getElementById(textareaId);
   const cursorPos = textarea.selectionStart;
   const text = textarea.value;
   const before = text.substring(0, cursorPos);
@@ -490,6 +681,90 @@ function addBulletPoint() {
   textarea.value = before + '\n• ' + after;
   textarea.focus();
   textarea.selectionStart = textarea.selectionEnd = cursorPos + 3;
+}
+
+// Species Traits Modal
+function openSpeciesTraitModal() {
+  document.getElementById('species-trait-title').value = '';
+  document.getElementById('species-trait-description').value = '';
+  document.getElementById('species-trait-modal').classList.add('active');
+}
+
+function saveSpeciesTrait() {
+  const trait = {
+    title: document.getElementById('species-trait-title').value,
+    description: document.getElementById('species-trait-description').value,
+  };
+  
+  if (!trait.title) return;
+  
+  if (!currentCharacter.speciesTraits) {
+    currentCharacter.speciesTraits = [];
+  }
+  currentCharacter.speciesTraits.push(trait);
+  renderDraggableItems('species-traits-content', currentCharacter.speciesTraits, 'speciesTraits');
+  closeModal('species-trait-modal');
+}
+
+// Feat Modal
+function openFeatModal() {
+  document.getElementById('feat-title').value = '';
+  document.getElementById('feat-description').value = '';
+  document.getElementById('feat-modal').classList.add('active');
+}
+
+function saveFeat() {
+  const feat = {
+    title: document.getElementById('feat-title').value,
+    description: document.getElementById('feat-description').value,
+  };
+  
+  if (!feat.title) return;
+  
+  if (!currentCharacter.feats) {
+    currentCharacter.feats = [];
+  }
+  currentCharacter.feats.push(feat);
+  renderDraggableItems('feats-content', currentCharacter.feats, 'feats');
+  closeModal('feat-modal');
+}
+
+// Language Modal
+function openLanguageModal() {
+  document.getElementById('language-name').value = '';
+  document.getElementById('language-modal').classList.add('active');
+}
+
+function saveLanguage() {
+  const name = document.getElementById('language-name').value;
+  
+  if (!name) return;
+  
+  if (!currentCharacter.languages) {
+    currentCharacter.languages = [];
+  }
+  currentCharacter.languages.push(name);
+  renderSimpleItems('languages-content', currentCharacter.languages, 'languages');
+  closeModal('language-modal');
+}
+
+// Resistance Modal
+function openResistanceModal() {
+  document.getElementById('resistance-name').value = '';
+  document.getElementById('resistance-modal').classList.add('active');
+}
+
+function saveResistance() {
+  const name = document.getElementById('resistance-name').value;
+  
+  if (!name) return;
+  
+  if (!currentCharacter.resistances) {
+    currentCharacter.resistances = [];
+  }
+  currentCharacter.resistances.push(name);
+  renderSimpleItems('resistances-content', currentCharacter.resistances, 'resistances');
+  closeModal('resistance-modal');
 }
 
 // ====== MINIMIZE TOGGLE ======
@@ -553,7 +828,7 @@ function toggleMinimize(sectionId) {
 
 // Event Listeners
 newCharacterBtn.addEventListener('click', () => {
-  currentCharacter = { id: null, weapons: [], classFeatures: [], speciesTraits: [], feats: [] };
+  currentCharacter = { id: null, weapons: [], classFeatures: [], speciesTraits: [], feats: [], languages: [], resistances: [] };
   showCharacterSheet();
   populateForm({});
   renderCharacterList();
@@ -587,16 +862,11 @@ Object.keys(saveProfCheckboxes).forEach(ability => {
   saveProfCheckboxes[ability].addEventListener('change', () => updateSavingThrow(ability));
 });
 
-// Skill proficiency changes
+// Skill proficiency toggles (3-state: click to cycle)
 Object.keys(skillAbilityMap).forEach(skill => {
-  const checkbox = document.getElementById(`${skill}-prof`);
-  if (checkbox) {
-    checkbox.addEventListener('change', () => {
-      updateSkill(skill);
-      if (skill === 'perception') {
-        updatePassivePerception();
-      }
-    });
+  const toggle = document.getElementById(`${skill}-prof`);
+  if (toggle) {
+    toggle.addEventListener('click', () => cycleSkillProficiency(skill));
   }
 });
 
@@ -626,23 +896,27 @@ document.getElementById('save-weapon-btn').addEventListener('click', saveWeapon)
 // Class feature modal
 document.getElementById('add-class-feature-btn').addEventListener('click', openClassFeatureModal);
 document.getElementById('save-class-feature-btn').addEventListener('click', saveClassFeature);
-document.getElementById('add-bullet-btn').addEventListener('click', addBulletPoint);
+document.getElementById('add-bullet-btn').addEventListener('click', () => addBulletPoint('feature-description'));
 
-// Species traits & Feats placeholders (+ buttons don't do anything yet)
-document.getElementById('add-species-trait-btn').addEventListener('click', () => {
-  // Placeholder - not implemented yet
-});
-document.getElementById('add-feat-btn').addEventListener('click', () => {
-  // Placeholder - not implemented yet
-});
+// Species trait modal
+document.getElementById('add-species-trait-btn').addEventListener('click', openSpeciesTraitModal);
+document.getElementById('save-species-trait-btn').addEventListener('click', saveSpeciesTrait);
+document.getElementById('add-species-trait-bullet-btn').addEventListener('click', () => addBulletPoint('species-trait-description'));
 
-// New section placeholders (+ buttons don't do anything yet)
-document.getElementById('add-language-btn').addEventListener('click', () => {
-  // Placeholder - not implemented yet
-});
-document.getElementById('add-resistance-btn').addEventListener('click', () => {
-  // Placeholder - not implemented yet
-});
+// Feat modal
+document.getElementById('add-feat-btn').addEventListener('click', openFeatModal);
+document.getElementById('save-feat-btn').addEventListener('click', saveFeat);
+document.getElementById('add-feat-bullet-btn').addEventListener('click', () => addBulletPoint('feat-description'));
+
+// Language modal
+document.getElementById('add-language-btn').addEventListener('click', openLanguageModal);
+document.getElementById('save-language-btn').addEventListener('click', saveLanguage);
+
+// Resistance modal
+document.getElementById('add-resistance-btn').addEventListener('click', openResistanceModal);
+document.getElementById('save-resistance-btn').addEventListener('click', saveResistance);
+
+// Remaining placeholders (+ buttons don't do anything yet)
 document.getElementById('add-equipment-btn').addEventListener('click', () => {
   // Placeholder - not implemented yet
 });

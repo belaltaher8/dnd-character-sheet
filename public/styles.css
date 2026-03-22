@@ -610,11 +610,40 @@ body {
   padding: 3px 0;
 }
 
-.skill-row input[type="checkbox"] {
-  width: 12px;
-  height: 12px;
+/* 3-state proficiency toggle */
+.prof-toggle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
   cursor: pointer;
-  accent-color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.prof-toggle:hover {
+  border-color: var(--gold);
+}
+
+.prof-toggle.proficient {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.prof-toggle.expertise {
+  background: #4a9eff;
+  border-color: #4a9eff;
+}
+
+.prof-toggle.expertise::after {
+  content: '×2';
+  font-size: 0.45rem;
+  font-weight: bold;
+  color: white;
 }
 
 .skill-value {
@@ -808,7 +837,145 @@ body {
   background: #d13550;
 }
 
-/* Class Features List */
+/* Draggable Items */
+.draggable-item {
+  background: var(--bg-dark);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+
+.draggable-item:active {
+  cursor: grabbing;
+}
+
+.draggable-item.dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.draggable-item.drag-over {
+  border-top: 2px solid var(--gold);
+}
+
+.draggable-item .drag-handle {
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  opacity: 0.5;
+  cursor: grab;
+}
+
+.draggable-item:hover .drag-handle {
+  opacity: 1;
+}
+
+.draggable-item .item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-left: 14px;
+}
+
+.draggable-item .item-title {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.draggable-item .delete-item-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.draggable-item .delete-item-btn:hover {
+  background: #d13550;
+}
+
+.draggable-item .item-desc {
+  font-size: 0.8rem;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  padding-left: 14px;
+}
+
+/* Simple list items (languages, resistances) */
+.simple-item {
+  background: var(--bg-dark);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: grab;
+}
+
+.simple-item:active {
+  cursor: grabbing;
+}
+
+.simple-item.dragging {
+  opacity: 0.5;
+}
+
+.simple-item.drag-over {
+  border-top: 2px solid var(--gold);
+}
+
+.simple-item .item-name {
+  font-size: 0.8rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.simple-item .drag-handle {
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  opacity: 0.5;
+}
+
+.simple-item:hover .drag-handle {
+  opacity: 1;
+}
+
+.simple-item .delete-item-btn {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.simple-item .delete-item-btn:hover {
+  background: #d13550;
+}
+
+/* Legacy class feature item - keep for backwards compatibility */
 .class-feature-item {
   background: var(--bg-dark);
   border-radius: 6px;

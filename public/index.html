@@ -179,7 +179,7 @@
                 </div>
                 <div class="skills-list">
                   <div class="skill-row">
-                    <input type="checkbox" id="athletics-prof">
+                    <div class="prof-toggle" id="athletics-prof" data-skill="athletics"></div>
                     <span class="skill-value" id="athletics-val">+0</span>
                     <label>Athletics</label>
                   </div>
@@ -200,17 +200,17 @@
                 </div>
                 <div class="skills-list">
                   <div class="skill-row">
-                    <input type="checkbox" id="acrobatics-prof">
+                    <div class="prof-toggle" id="acrobatics-prof" data-skill="acrobatics"></div>
                     <span class="skill-value" id="acrobatics-val">+0</span>
                     <label>Acrobatics</label>
                   </div>
                   <div class="skill-row">
-                    <input type="checkbox" id="sleight-of-hand-prof">
+                    <div class="prof-toggle" id="sleight-of-hand-prof" data-skill="sleight-of-hand"></div>
                     <span class="skill-value" id="sleight-of-hand-val">+0</span>
                     <label>Sleight of Hand</label>
                   </div>
                   <div class="skill-row">
-                    <input type="checkbox" id="stealth-prof">
+                    <div class="prof-toggle" id="stealth-prof" data-skill="stealth"></div>
                     <span class="skill-value" id="stealth-val">+0</span>
                     <label>Stealth</label>
                   </div>
@@ -255,27 +255,27 @@
               </div>
               <div class="skills-list">
                 <div class="skill-row">
-                  <input type="checkbox" id="arcana-prof">
+                  <div class="prof-toggle" id="arcana-prof" data-skill="arcana"></div>
                   <span class="skill-value" id="arcana-val">+0</span>
                   <label>Arcana</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="history-prof">
+                  <div class="prof-toggle" id="history-prof" data-skill="history"></div>
                   <span class="skill-value" id="history-val">+0</span>
                   <label>History</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="investigation-prof">
+                  <div class="prof-toggle" id="investigation-prof" data-skill="investigation"></div>
                   <span class="skill-value" id="investigation-val">+0</span>
                   <label>Investigation</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="nature-prof">
+                  <div class="prof-toggle" id="nature-prof" data-skill="nature"></div>
                   <span class="skill-value" id="nature-val">+0</span>
                   <label>Nature</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="religion-prof">
+                  <div class="prof-toggle" id="religion-prof" data-skill="religion"></div>
                   <span class="skill-value" id="religion-val">+0</span>
                   <label>Religion</label>
                 </div>
@@ -296,27 +296,27 @@
               </div>
               <div class="skills-list">
                 <div class="skill-row">
-                  <input type="checkbox" id="animal-handling-prof">
+                  <div class="prof-toggle" id="animal-handling-prof" data-skill="animal-handling"></div>
                   <span class="skill-value" id="animal-handling-val">+0</span>
                   <label>Animal Handling</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="insight-prof">
+                  <div class="prof-toggle" id="insight-prof" data-skill="insight"></div>
                   <span class="skill-value" id="insight-val">+0</span>
                   <label>Insight</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="medicine-prof">
+                  <div class="prof-toggle" id="medicine-prof" data-skill="medicine"></div>
                   <span class="skill-value" id="medicine-val">+0</span>
                   <label>Medicine</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="perception-prof">
+                  <div class="prof-toggle" id="perception-prof" data-skill="perception"></div>
                   <span class="skill-value" id="perception-val">+0</span>
                   <label>Perception</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="survival-prof">
+                  <div class="prof-toggle" id="survival-prof" data-skill="survival"></div>
                   <span class="skill-value" id="survival-val">+0</span>
                   <label>Survival</label>
                 </div>
@@ -337,22 +337,22 @@
               </div>
               <div class="skills-list">
                 <div class="skill-row">
-                  <input type="checkbox" id="deception-prof">
+                  <div class="prof-toggle" id="deception-prof" data-skill="deception"></div>
                   <span class="skill-value" id="deception-val">+0</span>
                   <label>Deception</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="intimidation-prof">
+                  <div class="prof-toggle" id="intimidation-prof" data-skill="intimidation"></div>
                   <span class="skill-value" id="intimidation-val">+0</span>
                   <label>Intimidation</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="performance-prof">
+                  <div class="prof-toggle" id="performance-prof" data-skill="performance"></div>
                   <span class="skill-value" id="performance-val">+0</span>
                   <label>Performance</label>
                 </div>
                 <div class="skill-row">
-                  <input type="checkbox" id="persuasion-prof">
+                  <div class="prof-toggle" id="persuasion-prof" data-skill="persuasion"></div>
                   <span class="skill-value" id="persuasion-val">+0</span>
                   <label>Persuasion</label>
                 </div>
@@ -581,6 +581,96 @@
       <div class="modal-footer">
         <button class="btn" data-modal="class-feature-modal">Cancel</button>
         <button class="btn primary" id="save-class-feature-btn">Add Feature</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Species Trait Modal -->
+  <div class="modal-overlay" id="species-trait-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Species Trait</h3>
+        <button class="modal-close" data-modal="species-trait-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Trait Name</label>
+          <input type="text" id="species-trait-title" placeholder="e.g., Darkvision, Fey Ancestry">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="species-trait-description" rows="4" placeholder="Describe the trait..."></textarea>
+          <button class="bullet-btn" id="add-species-trait-bullet-btn">• Add Bullet Point</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="species-trait-modal">Cancel</button>
+        <button class="btn primary" id="save-species-trait-btn">Add Trait</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feat Modal -->
+  <div class="modal-overlay" id="feat-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Feat</h3>
+        <button class="modal-close" data-modal="feat-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Feat Name</label>
+          <input type="text" id="feat-title" placeholder="e.g., Alert, Lucky">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="feat-description" rows="4" placeholder="Describe the feat..."></textarea>
+          <button class="bullet-btn" id="add-feat-bullet-btn">• Add Bullet Point</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="feat-modal">Cancel</button>
+        <button class="btn primary" id="save-feat-btn">Add Feat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language Modal -->
+  <div class="modal-overlay" id="language-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Language</h3>
+        <button class="modal-close" data-modal="language-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Language</label>
+          <input type="text" id="language-name" placeholder="e.g., Common, Elvish, Dwarvish">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="language-modal">Cancel</button>
+        <button class="btn primary" id="save-language-btn">Add Language</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resistance Modal -->
+  <div class="modal-overlay" id="resistance-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Resistance</h3>
+        <button class="modal-close" data-modal="resistance-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Resistance</label>
+          <input type="text" id="resistance-name" placeholder="e.g., Fire, Poison, Necrotic">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="resistance-modal">Cancel</button>
+        <button class="btn primary" id="save-resistance-btn">Add Resistance</button>
       </div>
     </div>
   </div>
