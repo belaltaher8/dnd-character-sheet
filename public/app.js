@@ -240,6 +240,9 @@ function populateForm(char) {
     if (btn) btn.classList.add('selected');
   }
   
+  // Spell Slots
+  initSpellSlots();
+  
   updateAllCalculations();
 }
 
@@ -323,6 +326,7 @@ function getFormData() {
     resistances: currentCharacter?.resistances || [],
     equipment: currentCharacter?.equipment || [],
     spellcastingAbility: currentCharacter?.spellcastingAbility || null,
+    spellSlots: currentCharacter?.spellSlots || {},
   };
 }
 
@@ -873,6 +877,91 @@ function updateSpellcastingStats() {
   spellAtkEl.textContent = formatModifier(spellAttackBonus);
 }
 
+// ====== SPELL SLOTS ======
+function updateSpellSlotCheckboxes(level) {
+  const row = document.querySelector(`.spell-slot-row[data-level="${level}"]`);
+  if (!row) return;
+  
+  const maxInput = row.querySelector('.spell-slot-max');
+  const checkboxContainer = row.querySelector('.spell-slot-checkboxes');
+  const max = parseInt(maxInput.value) || 0;
+  
+  // Get current used slots from character data
+  const usedSlots = currentCharacter?.spellSlots?.[level]?.used || [];
+  
+  checkboxContainer.innerHTML = '';
+  
+  for (let i = 0; i < max; i++) {
+    const checkbox = document.createElement('div');
+    checkbox.className = 'spell-slot-checkbox';
+    if (usedSlots.includes(i)) {
+      checkbox.classList.add('used');
+    }
+    checkbox.dataset.index = i;
+    checkbox.dataset.level = level;
+    checkbox.addEventListener('click', toggleSpellSlot);
+    checkboxContainer.appendChild(checkbox);
+  }
+  
+  // Update character data
+  if (!currentCharacter.spellSlots) {
+    currentCharacter.spellSlots = {};
+  }
+  if (!currentCharacter.spellSlots[level]) {
+    currentCharacter.spellSlots[level] = { max: 0, used: [] };
+  }
+  currentCharacter.spellSlots[level].max = max;
+  // Filter out any used indices that are now out of range
+  currentCharacter.spellSlots[level].used = usedSlots.filter(i => i < max);
+}
+
+function toggleSpellSlot(e) {
+  const checkbox = e.target;
+  const level = checkbox.dataset.level;
+  const index = parseInt(checkbox.dataset.index);
+  
+  if (!currentCharacter.spellSlots) {
+    currentCharacter.spellSlots = {};
+  }
+  if (!currentCharacter.spellSlots[level]) {
+    currentCharacter.spellSlots[level] = { max: 0, used: [] };
+  }
+  
+  const used = currentCharacter.spellSlots[level].used;
+  const usedIndex = used.indexOf(index);
+  
+  if (usedIndex === -1) {
+    used.push(index);
+    checkbox.classList.add('used');
+  } else {
+    used.splice(usedIndex, 1);
+    checkbox.classList.remove('used');
+  }
+}
+
+function initSpellSlots() {
+  const levels = ['1', '2', '3', '4', '5', 'other'];
+  
+  levels.forEach(level => {
+    const row = document.querySelector(`.spell-slot-row[data-level="${level}"]`);
+    if (!row) return;
+    
+    const maxInput = row.querySelector('.spell-slot-max');
+    
+    // Set initial value from character data
+    const slotData = currentCharacter?.spellSlots?.[level];
+    if (slotData) {
+      maxInput.value = slotData.max || 0;
+    }
+    
+    // Update checkboxes
+    updateSpellSlotCheckboxes(level);
+    
+    // Add event listener for max input changes
+    maxInput.addEventListener('input', () => updateSpellSlotCheckboxes(level));
+  });
+}
+
 // ====== MINIMIZE TOGGLE ======
 // Define the row structure for the right column feature boxes
 const featureRows = [
@@ -1039,9 +1128,6 @@ document.querySelectorAll('.spell-ability-btn').forEach(btn => {
 
 // Remaining placeholders (+ buttons don't do anything yet)
 document.getElementById('add-coin-btn').addEventListener('click', () => {
-  // Placeholder - not implemented yet
-});
-document.getElementById('add-spell-slot-btn').addEventListener('click', () => {
   // Placeholder - not implemented yet
 });
 

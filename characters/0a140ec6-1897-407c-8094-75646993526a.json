@@ -145,5 +145,31 @@
     "Cold"
   ],
   "equipment": [],
-  "spellcastingAbility": "int"
+  "spellcastingAbility": "int",
+  "spellSlots": {
+    "1": {
+      "max": 4,
+      "used": []
+    },
+    "2": {
+      "max": 2,
+      "used": []
+    },
+    "3": {
+      "max": 0,
+      "used": []
+    },
+    "4": {
+      "max": 0,
+      "used": []
+    },
+    "5": {
+      "max": 0,
+      "used": []
+    },
+    "other": {
+      "max": 1,
+      "used": []
+    }
+  }
 }
