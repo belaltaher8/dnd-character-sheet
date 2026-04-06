@@ -1573,18 +1573,46 @@ body {
   color: var(--gold);
 }
 
+.uses-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
 /* ====== COMBAT ACTION CARDS ====== */
 .combat-action-card {
   background: var(--bg-light);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px;
+  padding-left: 24px;
   margin-bottom: 8px;
   position: relative;
+  cursor: grab;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .combat-action-card:last-child {
   margin-bottom: 0;
+}
+
+.combat-action-card.dragging {
+  opacity: 0.5;
+}
+
+.combat-action-card.drag-over {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.combat-action-drag {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: grab;
 }
 
 .combat-action-header {

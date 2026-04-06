@@ -40,6 +40,7 @@ const noCharacter = document.getElementById('no-character');
 const characterSheet = document.getElementById('character-sheet');
 const saveBtn = document.getElementById('save-btn');
 const deleteBtn = document.getElementById('delete-btn');
+const duplicateBtn = document.getElementById('duplicate-btn');
 
 // Ability score inputs
 const abilityInputs = {
@@ -459,6 +460,9 @@ function renderCombatActions(actions) {
   actions.forEach((action, index) => {
     const card = document.createElement('div');
     card.className = 'combat-action-card';
+    card.draggable = true;
+    card.dataset.index = index;
+    card.dataset.key = 'combatActions';
     
     let statsHtml = '';
     if (action.castingTime) {
@@ -484,17 +488,21 @@ function renderCombatActions(actions) {
     }
     
     let usesHtml = '';
-    if (action.type === 'action' && action.uses > 0) {
-      usesHtml = `
-        <div class="combat-action-uses">
-          <span class="combat-action-uses-label">Uses:</span>
-          <div class="combat-action-uses-checkboxes" data-index="${index}">
-            ${Array(action.uses).fill(0).map((_, i) => 
-              `<div class="combat-action-use-checkbox${action.usedUses?.includes(i) ? ' used' : ''}" data-use-index="${i}"></div>`
-            ).join('')}
+    if (action.type === 'action') {
+      if (action.uses === 0) {
+        usesHtml = '<div class="combat-action-uses"><span class="combat-action-uses-label">Uses: ∞</span></div>';
+      } else if (action.uses > 0) {
+        usesHtml = `
+          <div class="combat-action-uses">
+            <span class="combat-action-uses-label">Uses:</span>
+            <div class="combat-action-uses-checkboxes" data-index="${index}">
+              ${Array(action.uses).fill(0).map((_, i) => 
+                `<div class="combat-action-use-checkbox${action.usedUses?.includes(i) ? ' used' : ''}" data-use-index="${i}"></div>`
+              ).join('')}
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      }
     }
     
     const typeLabel = {
@@ -505,6 +513,7 @@ function renderCombatActions(actions) {
     }[action.type] || action.type;
     
     card.innerHTML = `
+      <span class="drag-handle combat-action-drag">⋮⋮</span>
       <div class="combat-action-header">
         <span class="combat-action-name">${action.name}</span>
         <span class="combat-action-type">${typeLabel}</span>
@@ -518,6 +527,13 @@ function renderCombatActions(actions) {
         <button class="combat-action-delete" data-index="${index}">&times;</button>
       </div>
     `;
+    
+    // Drag events
+    card.addEventListener('dragstart', handleCombatActionDragStart);
+    card.addEventListener('dragend', handleCombatActionDragEnd);
+    card.addEventListener('dragover', handleCombatActionDragOver);
+    card.addEventListener('drop', handleCombatActionDrop);
+    card.addEventListener('dragleave', handleCombatActionDragLeave);
     
     container.appendChild(card);
   });
@@ -924,6 +940,55 @@ function handleDrop(e) {
   } else {
     renderDraggableItems(getContainerId(key), arr, key);
   }
+}
+
+// Combat action drag handlers
+let draggedActionItem = null;
+let draggedActionIndex = null;
+
+function handleCombatActionDragStart(e) {
+  draggedActionItem = this;
+  draggedActionIndex = parseInt(this.dataset.index);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleCombatActionDragEnd(e) {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.combat-action-card.drag-over').forEach(el => el.classList.remove('drag-over'));
+  draggedActionItem = null;
+  draggedActionIndex = null;
+}
+
+function handleCombatActionDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  
+  if (this === draggedActionItem) return;
+  this.classList.add('drag-over');
+}
+
+function handleCombatActionDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+
+function handleCombatActionDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  
+  if (this === draggedActionItem) return;
+  
+  const targetIndex = parseInt(this.dataset.index);
+  
+  // Reorder the array
+  const arr = currentCharacter.combatActions;
+  if (!arr) return;
+  
+  const [removed] = arr.splice(draggedActionIndex, 1);
+  arr.splice(targetIndex, 0, removed);
+  
+  // Re-render
+  renderCombatActions(arr);
 }
 
 function getContainerId(key) {
@@ -1446,16 +1511,38 @@ saveBtn.addEventListener('click', async () => {
   currentCharacter = saved;
   await fetchCharacters();
   selectCharacter(saved);
+  document.getElementById('save-success-modal').classList.add('active');
 });
 
-deleteBtn.addEventListener('click', async () => {
+deleteBtn.addEventListener('click', () => {
   if (!currentCharacter?.id) return;
-  if (!confirm('Delete this character?')) return;
+  document.getElementById('delete-character-message').textContent = 
+    `Are you sure you want to delete "${currentCharacter.name || 'this character'}"? This cannot be undone.`;
+  document.getElementById('delete-character-modal').classList.add('active');
+});
+
+document.getElementById('confirm-delete-character-btn').addEventListener('click', async () => {
+  if (!currentCharacter?.id) return;
   
   await deleteCharacter(currentCharacter.id);
   currentCharacter = null;
   hideCharacterSheet();
   await fetchCharacters();
+  closeModal('delete-character-modal');
+});
+
+duplicateBtn.addEventListener('click', async () => {
+  if (!currentCharacter) return;
+  
+  const data = getFormData();
+  // Remove the id so it creates a new character
+  delete data.id;
+  // Append "(Copy)" to the name
+  data.name = (data.name || 'Character') + ' (Copy)';
+  
+  const saved = await saveCharacter(data);
+  await fetchCharacters();
+  selectCharacter(saved);
 });
 
 // Ability score changes

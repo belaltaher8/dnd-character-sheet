@@ -564,10 +564,44 @@
         <!-- Actions -->
         <div class="actions">
           <button id="save-btn" class="btn primary">Save Character</button>
+          <button id="duplicate-btn" class="btn">Duplicate Character</button>
           <button id="delete-btn" class="btn danger">Delete Character</button>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Save Success Modal -->
+  <div class="modal-overlay" id="save-success-modal">
+    <div class="modal modal-small">
+      <div class="modal-header">
+        <h3>Success</h3>
+        <button class="modal-close" data-modal="save-success-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Character saved successfully!</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn primary" data-modal="save-success-modal">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Character Confirmation Modal -->
+  <div class="modal-overlay" id="delete-character-modal">
+    <div class="modal modal-small">
+      <div class="modal-header">
+        <h3>Delete Character</h3>
+        <button class="modal-close" data-modal="delete-character-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="delete-character-message">Are you sure you want to delete this character? This cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-modal="delete-character-modal">Cancel</button>
+        <button class="btn danger" id="confirm-delete-character-btn">Delete</button>
+      </div>
+    </div>
   </div>
 
   <!-- Combat Action Modal -->
@@ -612,7 +646,7 @@
           </div>
         </div>
         <div class="form-group" id="uses-group" style="display: none;">
-          <label>Number of Uses</label>
+          <label>Number of Uses <span class="uses-hint">(0 = unlimited)</span></label>
           <input type="number" id="action-uses" min="0" max="20" value="1" placeholder="e.g., 3">
         </div>
         <div class="form-group" id="spell-options-group" style="display: none;">

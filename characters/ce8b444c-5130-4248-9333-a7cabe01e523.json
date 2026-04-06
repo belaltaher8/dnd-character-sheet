@@ -1,6 +1,5 @@
 {
-  "id": "0a140ec6-1897-407c-8094-75646993526a",
-  "name": "Karlton \"Phil\" Marixmus",
+  "name": "Karlton \"Phil\" Marixmus (Copy)",
   "class": "Artificer",
   "subclass": "Battle Smith",
   "species": "Aasimar",
@@ -214,5 +213,6 @@
       "max": 1,
       "used": []
     }
-  }
+  },
+  "id": "ce8b444c-5130-4248-9333-a7cabe01e523"
 }
