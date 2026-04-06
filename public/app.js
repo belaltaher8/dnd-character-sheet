@@ -244,6 +244,9 @@ function populateForm(char) {
   // Spell Slots
   initSpellSlots();
   
+  // Restore feature box order
+  restoreFeatureBoxOrder();
+  
   updateAllCalculations();
 }
 
@@ -328,6 +331,7 @@ function getFormData() {
     equipment: currentCharacter?.equipment || [],
     spellcastingAbility: currentCharacter?.spellcastingAbility || null,
     spellSlots: currentCharacter?.spellSlots || {},
+    featureBoxOrder: currentCharacter?.featureBoxOrder || null,
   };
 }
 
@@ -452,6 +456,16 @@ function renderCombatActions(actions) {
   const container = document.getElementById('combat-actions-content');
   container.innerHTML = '';
   
+  // Update prepared spells count
+  let preparedCount = 0;
+  if (actions) {
+    preparedCount = actions.filter(a => (a.type === 'spell-attack' || a.type === 'spell-save' || a.type === 'spell') && a.prepared).length;
+  }
+  const preparedCountEl = document.getElementById('prepared-spells-count');
+  if (preparedCountEl) {
+    preparedCountEl.textContent = `Prepared: ${preparedCount}`;
+  }
+  
   if (!actions || actions.length === 0) {
     container.innerHTML = '<div class="empty-message" style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 10px;">No combat actions yet</div>';
     return;
@@ -478,13 +492,24 @@ function renderCombatActions(actions) {
       statsHtml += `<div class="combat-action-stat"><span class="combat-action-stat-label">Range:</span><span class="combat-action-stat-value">${action.range}</span></div>`;
     }
     
-    let badgesHtml = '';
-    if (action.concentration || action.ritual || action.materials) {
-      badgesHtml = '<div class="combat-action-badges">';
-      if (action.concentration) badgesHtml += '<span class="combat-action-badge">C</span>';
-      if (action.ritual) badgesHtml += '<span class="combat-action-badge">R</span>';
-      if (action.materials) badgesHtml += '<span class="combat-action-badge">M</span>';
-      badgesHtml += '</div>';
+    // Build spell indicators (P, C, R, M) as superscript badges
+    let indicatorsHtml = '';
+    if (action.type === 'spell-attack' || action.type === 'spell-save' || action.type === 'spell') {
+      const indicators = [];
+      if (action.prepared) indicators.push('<span class="spell-indicator prepared">P</span>');
+      if (action.concentration) indicators.push('<span class="spell-indicator concentration">C</span>');
+      if (action.ritual) indicators.push('<span class="spell-indicator ritual">R</span>');
+      if (action.materials) indicators.push('<span class="spell-indicator materials">M</span>');
+      if (indicators.length > 0) {
+        indicatorsHtml = indicators.join('');
+      }
+    }
+    
+    // Spell level badge
+    let spellLevelBadge = '';
+    if ((action.type === 'spell-attack' || action.type === 'spell-save' || action.type === 'spell') && action.spellLevel) {
+      const levelText = action.spellLevel === 'cantrip' ? 'C' : action.spellLevel;
+      spellLevelBadge = `<span class="spell-level-badge">${levelText}</span>`;
     }
     
     let usesHtml = '';
@@ -509,17 +534,21 @@ function renderCombatActions(actions) {
       'weapon': 'Weapon',
       'spell-attack': 'Spell Atk',
       'spell-save': 'Spell Save',
+      'spell': 'Spell',
       'action': 'Action'
     }[action.type] || action.type;
     
     card.innerHTML = `
       <span class="drag-handle combat-action-drag">⋮⋮</span>
       <div class="combat-action-header">
-        <span class="combat-action-name">${action.name}</span>
+        <div class="combat-action-name-wrapper">
+          ${indicatorsHtml}
+          <span class="combat-action-name">${action.name}</span>
+          ${spellLevelBadge}
+        </div>
         <span class="combat-action-type">${typeLabel}</span>
       </div>
       <div class="combat-action-stats">${statsHtml}</div>
-      ${badgesHtml}
       ${usesHtml}
       ${action.notes ? `<div class="combat-action-notes">${action.notes}</div>` : ''}
       <div class="combat-action-buttons">
@@ -602,6 +631,8 @@ function openCombatActionModal() {
   document.getElementById('action-concentration').checked = false;
   document.getElementById('action-ritual').checked = false;
   document.getElementById('action-materials').checked = false;
+  document.getElementById('action-spell-level').value = 'cantrip';
+  document.getElementById('action-prepared').checked = false;
   
   // Reset to weapon type
   currentActionType = 'weapon';
@@ -632,6 +663,8 @@ function editCombatAction(index) {
   document.getElementById('action-concentration').checked = action.concentration || false;
   document.getElementById('action-ritual').checked = action.ritual || false;
   document.getElementById('action-materials').checked = action.materials || false;
+  document.getElementById('action-spell-level').value = action.spellLevel || 'cantrip';
+  document.getElementById('action-prepared').checked = action.prepared || false;
   
   document.querySelectorAll('.action-type-btn').forEach(btn => {
     btn.classList.toggle('selected', btn.dataset.type === action.type);
@@ -651,6 +684,7 @@ function updateCombatActionModalFields() {
   const rangeGroup = document.getElementById('range-group');
   const usesGroup = document.getElementById('uses-group');
   const spellOptionsGroup = document.getElementById('spell-options-group');
+  const spellLevelRow = document.getElementById('spell-level-row');
   const atkInput = document.getElementById('action-atk');
   const castingTimeInput = document.getElementById('action-casting-time');
   
@@ -668,6 +702,7 @@ function updateCombatActionModalFields() {
       rangeGroup.style.display = 'block';
       usesGroup.style.display = 'none';
       spellOptionsGroup.style.display = 'none';
+      spellLevelRow.style.display = 'none';
       break;
     case 'spell-attack':
       castingTimeGroup.style.display = 'block';
@@ -680,6 +715,7 @@ function updateCombatActionModalFields() {
       rangeGroup.style.display = 'block';
       usesGroup.style.display = 'none';
       spellOptionsGroup.style.display = 'block';
+      spellLevelRow.style.display = 'flex';
       break;
     case 'spell-save':
       castingTimeGroup.style.display = 'block';
@@ -692,15 +728,27 @@ function updateCombatActionModalFields() {
       rangeGroup.style.display = 'block';
       usesGroup.style.display = 'none';
       spellOptionsGroup.style.display = 'block';
+      spellLevelRow.style.display = 'flex';
+      break;
+    case 'spell':
+      castingTimeGroup.style.display = 'block';
+      castingTimeInput.readOnly = false;
+      atkBonusGroup.style.display = 'none';
+      damageGroup.style.display = 'none';
+      rangeGroup.style.display = 'block';
+      usesGroup.style.display = 'none';
+      spellOptionsGroup.style.display = 'block';
+      spellLevelRow.style.display = 'flex';
       break;
     case 'action':
       castingTimeGroup.style.display = 'block';
       castingTimeInput.readOnly = false;
       atkBonusGroup.style.display = 'none';
       damageGroup.style.display = 'none';
-      rangeGroup.style.display = 'none';
+      rangeGroup.style.display = 'block';
       usesGroup.style.display = 'block';
       spellOptionsGroup.style.display = 'none';
+      spellLevelRow.style.display = 'none';
       break;
   }
 }
@@ -728,21 +776,23 @@ function saveCombatAction() {
     type: currentActionType,
     name: document.getElementById('action-name').value,
     castingTime: document.getElementById('action-casting-time').value,
+    range: document.getElementById('action-range').value,
     notes: document.getElementById('action-notes').value,
   };
   
   if (!action.name) return;
   
-  if (currentActionType !== 'action') {
+  if (currentActionType === 'weapon' || currentActionType === 'spell-attack' || currentActionType === 'spell-save') {
     action.atk = document.getElementById('action-atk').value;
     action.damage = document.getElementById('action-damage').value;
-    action.range = document.getElementById('action-range').value;
   }
   
-  if (currentActionType === 'spell-attack' || currentActionType === 'spell-save') {
+  if (currentActionType === 'spell-attack' || currentActionType === 'spell-save' || currentActionType === 'spell') {
     action.concentration = document.getElementById('action-concentration').checked;
     action.ritual = document.getElementById('action-ritual').checked;
     action.materials = document.getElementById('action-materials').checked;
+    action.spellLevel = document.getElementById('action-spell-level').value;
+    action.prepared = document.getElementById('action-prepared').checked;
   }
   
   if (currentActionType === 'action') {
@@ -887,6 +937,7 @@ let draggedIndex = null;
 let draggedKey = null;
 
 function handleDragStart(e) {
+  e.stopPropagation();
   draggedItem = this;
   draggedIndex = parseInt(this.dataset.index);
   draggedKey = this.dataset.key;
@@ -895,6 +946,7 @@ function handleDragStart(e) {
 }
 
 function handleDragEnd(e) {
+  e.stopPropagation();
   this.classList.remove('dragging');
   document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
   draggedItem = null;
@@ -903,6 +955,7 @@ function handleDragEnd(e) {
 }
 
 function handleDragOver(e) {
+  e.stopPropagation();
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
   
@@ -914,10 +967,12 @@ function handleDragOver(e) {
 }
 
 function handleDragLeave(e) {
+  e.stopPropagation();
   this.classList.remove('drag-over');
 }
 
 function handleDrop(e) {
+  e.stopPropagation();
   e.preventDefault();
   this.classList.remove('drag-over');
   
@@ -1001,6 +1056,144 @@ function getContainerId(key) {
     'equipment': 'equipment-content',
   };
   return map[key];
+}
+
+// Feature box drag handlers
+let draggedFeatureBox = null;
+let featureBoxDragAllowed = false;
+
+function initFeatureBoxDragHandlers() {
+  const container = document.getElementById('right-features-container');
+  if (!container) return;
+  
+  container.querySelectorAll('.draggable-feature').forEach(box => {
+    // Track mousedown on handle to allow drag
+    const handle = box.querySelector('.feature-drag-handle');
+    if (handle) {
+      handle.addEventListener('mousedown', () => {
+        featureBoxDragAllowed = true;
+      });
+    }
+    
+    box.addEventListener('dragstart', handleFeatureBoxDragStart);
+    box.addEventListener('dragend', handleFeatureBoxDragEnd);
+    box.addEventListener('dragover', handleFeatureBoxDragOver);
+    box.addEventListener('dragleave', handleFeatureBoxDragLeave);
+    box.addEventListener('drop', handleFeatureBoxDrop);
+  });
+  
+  // Reset flag on mouseup anywhere
+  document.addEventListener('mouseup', () => {
+    featureBoxDragAllowed = false;
+  });
+}
+
+function handleFeatureBoxDragStart(e) {
+  // Only allow drag if started from handle
+  if (!featureBoxDragAllowed) {
+    e.preventDefault();
+    return;
+  }
+  
+  draggedFeatureBox = this;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', this.id);
+  
+  // Use timeout to prevent visual glitch
+  setTimeout(() => {
+    this.style.opacity = '0.5';
+  }, 0);
+}
+
+function handleFeatureBoxDragEnd(e) {
+  this.classList.remove('dragging');
+  this.style.opacity = '';
+  document.querySelectorAll('.draggable-feature.drag-over').forEach(el => el.classList.remove('drag-over'));
+  draggedFeatureBox = null;
+  featureBoxDragAllowed = false;
+}
+
+function handleFeatureBoxDragOver(e) {
+  // Only handle if we're dragging a feature box
+  if (!draggedFeatureBox) return;
+  
+  // Don't interfere with inner item drags
+  if (e.target.closest('.draggable-item') || e.target.closest('.simple-item') || e.target.closest('.combat-action-card')) return;
+  
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  
+  if (this === draggedFeatureBox) return;
+  this.classList.add('drag-over');
+}
+
+function handleFeatureBoxDragLeave(e) {
+  if (!draggedFeatureBox) return;
+  this.classList.remove('drag-over');
+}
+
+function handleFeatureBoxDrop(e) {
+  // Only handle if we're dragging a feature box
+  if (!draggedFeatureBox) return;
+  
+  // Don't interfere with inner item drags
+  if (e.target.closest('.draggable-item') || e.target.closest('.simple-item') || e.target.closest('.combat-action-card')) return;
+  
+  e.preventDefault();
+  e.stopPropagation();
+  this.classList.remove('drag-over');
+  
+  if (this === draggedFeatureBox) return;
+  
+  const container = document.getElementById('right-features-container');
+  const boxes = [...container.querySelectorAll('.draggable-feature')];
+  const fromIndex = boxes.indexOf(draggedFeatureBox);
+  const toIndex = boxes.indexOf(this);
+  
+  // Swap positions (true swap, not insert)
+  if (fromIndex !== toIndex) {
+    const fromBox = draggedFeatureBox;
+    const toBox = this;
+    
+    // Create placeholder
+    const placeholder = document.createElement('div');
+    container.insertBefore(placeholder, fromBox);
+    
+    // Move boxes
+    container.insertBefore(fromBox, toBox);
+    container.insertBefore(toBox, placeholder);
+    
+    // Remove placeholder
+    container.removeChild(placeholder);
+  }
+  
+  // Save the order to character
+  saveFeatureBoxOrder();
+}
+
+function saveFeatureBoxOrder() {
+  const container = document.getElementById('right-features-container');
+  if (!container) return;
+  
+  const order = [...container.querySelectorAll('.draggable-feature')].map(box => box.id);
+  currentCharacter.featureBoxOrder = order;
+}
+
+function restoreFeatureBoxOrder() {
+  const container = document.getElementById('right-features-container');
+  if (!container || !currentCharacter?.featureBoxOrder) return;
+  
+  const order = currentCharacter.featureBoxOrder;
+  const boxes = [...container.querySelectorAll('.draggable-feature')];
+  
+  // Sort boxes according to saved order
+  order.forEach(id => {
+    const box = boxes.find(b => b.id === id);
+    if (box) {
+      container.appendChild(box);
+    }
+  });
 }
 
 // Pending delete info for confirmation
@@ -1640,7 +1833,7 @@ document.getElementById('add-coin-btn').addEventListener('click', () => {
 });
 
 // Modal close buttons
-document.querySelectorAll('.modal-close, .modal-footer .btn:not(.primary)').forEach(btn => {
+document.querySelectorAll('.modal-close, .modal-footer .btn[data-modal]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const modalId = e.target.dataset.modal;
     if (modalId) closeModal(modalId);
@@ -1666,3 +1859,4 @@ document.querySelectorAll('.minimize-btn').forEach(btn => {
 
 // Initialize
 fetchCharacters();
+initFeatureBoxDragHandlers();

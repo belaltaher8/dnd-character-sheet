@@ -745,8 +745,28 @@ body {
   gap: 8px;
 }
 
-.feature-header span {
+.feature-header > span:not(.feature-drag-handle) {
   flex: 1;
+}
+
+.feature-drag-handle {
+  cursor: grab;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0 2px;
+  user-select: none;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  flex: 0 0 auto;
+}
+
+.feature-drag-handle:hover {
+  opacity: 1;
+  color: var(--gold);
+}
+
+.feature-drag-handle:active {
+  cursor: grabbing;
 }
 
 .minimize-btn, .add-btn {
@@ -1174,6 +1194,25 @@ body {
   transition: margin 0.2s ease;
 }
 
+.bottom-features.draggable-features {
+  grid-auto-rows: min-content;
+}
+
+.draggable-feature {
+  cursor: default;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.draggable-feature.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.draggable-feature.drag-over {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
 /* When both boxes in a row are minimized, reduce the row's visual footprint */
 .bottom-features:has(.feature-box:first-child.minimized):has(.feature-box:last-child.minimized) {
   margin-bottom: -5px;
@@ -1579,6 +1618,31 @@ body {
   font-weight: normal;
 }
 
+.prepared-checkbox {
+  margin-top: 6px;
+}
+
+.prepared-spells-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+#action-spell-level {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+#action-spell-level:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
 /* ====== COMBAT ACTION CARDS ====== */
 .combat-action-card {
   background: var(--bg-light);
@@ -1622,10 +1686,54 @@ body {
   margin-bottom: 6px;
 }
 
+.combat-action-name-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
 .combat-action-name {
   font-weight: bold;
   color: var(--gold);
   font-size: 0.9rem;
+}
+
+.spell-indicator {
+  font-size: 0.55rem;
+  font-weight: bold;
+  vertical-align: super;
+  margin-right: 1px;
+}
+
+.spell-indicator.prepared {
+  color: #4a9;
+}
+
+.spell-indicator.concentration {
+  color: #e74;
+}
+
+.spell-indicator.ritual {
+  color: #7af;
+}
+
+.spell-indicator.materials {
+  color: #ca7;
+}
+
+.spell-level-badge {
+  font-size: 0.6rem;
+  padding: 1px 4px;
+  background: var(--gold);
+  color: var(--bg-dark);
+  border-radius: 3px;
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+.combat-action-name-wrapper {
+  display: flex;
+  align-items: baseline;
 }
 
 .combat-action-type {

@@ -93,21 +93,59 @@
       "usedUses": []
     },
     {
+      "type": "action",
+      "name": "Flash Of Genius",
+      "castingTime": "Reaction",
+      "range": "30ft",
+      "notes": "Add Int Modifier to ability check or saving throw",
+      "uses": 4,
+      "usedUses": []
+    },
+    {
       "type": "spell-attack",
       "name": "Chromatic Orb",
       "castingTime": "Action",
+      "range": "90ft",
       "notes": "Acid, Fire, Cold, Lightning, Poison, Thunder, if same number then bounce",
       "atk": "+7",
       "damage": "3d8",
-      "range": "90ft",
       "concentration": false,
       "ritual": false,
-      "materials": false
+      "materials": false,
+      "spellLevel": "1",
+      "prepared": false
+    },
+    {
+      "type": "spell",
+      "name": "Cure Wounds",
+      "castingTime": "Action",
+      "range": "Touch",
+      "notes": "Heal 2d8 + int. modifier",
+      "concentration": false,
+      "ritual": false,
+      "materials": false,
+      "spellLevel": "1",
+      "prepared": true
+    },
+    {
+      "type": "spell-save",
+      "name": "Faierie Fire",
+      "castingTime": "Action",
+      "range": "60 ft",
+      "notes": "Dex saving throw, 20 ft cube, if failed save, advantage on all attack roles and can't go invisible for 1 min",
+      "atk": "15",
+      "damage": "",
+      "concentration": true,
+      "ritual": false,
+      "materials": false,
+      "spellLevel": "1",
+      "prepared": true
     },
     {
       "type": "action",
       "name": "Charm of the Ice Troll",
       "castingTime": "Reaction",
+      "range": "Self",
       "notes": "Reduce Cold Dmg to 0, regain HP == to half cold dmg. you would've taken",
       "uses": 1,
       "usedUses": []
@@ -195,7 +233,7 @@
       "used": []
     },
     "2": {
-      "max": 2,
+      "max": 3,
       "used": []
     },
     "3": {
@@ -214,5 +252,15 @@
       "max": 1,
       "used": []
     }
-  }
+  },
+  "featureBoxOrder": [
+    "spellcasting-section",
+    "spell-slots-section",
+    "species-traits-section",
+    "resistances-section",
+    "equipment-section",
+    "coins-section",
+    "languages-section",
+    "feats-section"
+  ]
 }

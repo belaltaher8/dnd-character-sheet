@@ -396,6 +396,7 @@
               <div class="feature-header">
                 <button class="minimize-btn" data-target="combat-actions-section">−</button>
                 <span>Combat Actions</span>
+                <span class="prepared-spells-count" id="prepared-spells-count"></span>
                 <button class="add-btn" id="add-combat-action-btn">+</button>
               </div>
               <div class="feature-content" id="combat-actions-content">
@@ -416,9 +417,10 @@
             </div>
 
             <!-- Bottom Row: Species Traits & Feats -->
-            <div class="bottom-features">
-              <div class="feature-box minimizable" id="species-traits-section">
+            <div class="bottom-features draggable-features" id="right-features-container">
+              <div class="feature-box minimizable draggable-feature" id="species-traits-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="species-traits-section">−</button>
                   <span>Species Traits</span>
                   <button class="add-btn" id="add-species-trait-btn">+</button>
@@ -427,8 +429,9 @@
                   <!-- Traits will be added dynamically -->
                 </div>
               </div>
-              <div class="feature-box minimizable" id="feats-section">
+              <div class="feature-box minimizable draggable-feature" id="feats-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="feats-section">−</button>
                   <span>Feats</span>
                   <button class="add-btn" id="add-feat-btn">+</button>
@@ -437,12 +440,10 @@
                   <!-- Feats will be added dynamically -->
                 </div>
               </div>
-            </div>
 
-            <!-- Row 2: Languages & Resistances -->
-            <div class="bottom-features">
-              <div class="feature-box minimizable" id="languages-section">
+              <div class="feature-box minimizable draggable-feature" id="languages-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="languages-section">−</button>
                   <span>Languages</span>
                   <button class="add-btn" id="add-language-btn">+</button>
@@ -451,8 +452,9 @@
                   <!-- Languages will be added dynamically -->
                 </div>
               </div>
-              <div class="feature-box minimizable" id="resistances-section">
+              <div class="feature-box minimizable draggable-feature" id="resistances-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="resistances-section">−</button>
                   <span>Resistances</span>
                   <button class="add-btn" id="add-resistance-btn">+</button>
@@ -461,12 +463,10 @@
                   <!-- Resistances will be added dynamically -->
                 </div>
               </div>
-            </div>
 
-            <!-- Row 3: Equipment & Coins -->
-            <div class="bottom-features">
-              <div class="feature-box minimizable" id="equipment-section">
+              <div class="feature-box minimizable draggable-feature" id="equipment-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="equipment-section">−</button>
                   <span>Equipment</span>
                   <button class="add-btn" id="add-equipment-btn">+</button>
@@ -475,8 +475,9 @@
                   <!-- Equipment will be added dynamically -->
                 </div>
               </div>
-              <div class="feature-box minimizable" id="coins-section">
+              <div class="feature-box minimizable draggable-feature" id="coins-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="coins-section">−</button>
                   <span>Coins</span>
                   <button class="add-btn" id="add-coin-btn">+</button>
@@ -485,12 +486,10 @@
                   <!-- Coins will be added dynamically -->
                 </div>
               </div>
-            </div>
 
-            <!-- Row 4: Spellcasting Ability & Spell Slots -->
-            <div class="bottom-features">
-              <div class="feature-box minimizable" id="spellcasting-section">
+              <div class="feature-box minimizable draggable-feature" id="spellcasting-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="spellcasting-section">−</button>
                   <span>Spellcasting Ability</span>
                 </div>
@@ -519,8 +518,9 @@
                   </div>
                 </div>
               </div>
-              <div class="feature-box minimizable" id="spell-slots-section">
+              <div class="feature-box minimizable draggable-feature" id="spell-slots-section" draggable="true">
                 <div class="feature-header">
+                  <span class="feature-drag-handle">⋮⋮</span>
                   <button class="minimize-btn" data-target="spell-slots-section">−</button>
                   <span>Spell Slots</span>
                 </div>
@@ -618,6 +618,7 @@
             <button class="action-type-btn selected" data-type="weapon">Weapon</button>
             <button class="action-type-btn" data-type="spell-attack">Spell Attack</button>
             <button class="action-type-btn" data-type="spell-save">Spell Save</button>
+            <button class="action-type-btn" data-type="spell">Spell</button>
             <button class="action-type-btn" data-type="action">Action</button>
           </div>
         </div>
@@ -643,6 +644,30 @@
           <div class="form-group" id="range-group">
             <label>Range</label>
             <input type="text" id="action-range" placeholder="e.g., 5 ft, 120 ft">
+          </div>
+        </div>
+        <div class="form-row" id="spell-level-row" style="display: none;">
+          <div class="form-group" id="spell-level-group">
+            <label>Spell Level</label>
+            <select id="action-spell-level">
+              <option value="cantrip">Cantrip</option>
+              <option value="1">1st</option>
+              <option value="2">2nd</option>
+              <option value="3">3rd</option>
+              <option value="4">4th</option>
+              <option value="5">5th</option>
+              <option value="6">6th</option>
+              <option value="7">7th</option>
+              <option value="8">8th</option>
+              <option value="9">9th</option>
+            </select>
+          </div>
+          <div class="form-group" id="prepared-group">
+            <label>Prepared</label>
+            <label class="spell-option prepared-checkbox">
+              <input type="checkbox" id="action-prepared">
+              <span class="option-badge">P</span> Prepared
+            </label>
           </div>
         </div>
         <div class="form-group" id="uses-group" style="display: none;">
