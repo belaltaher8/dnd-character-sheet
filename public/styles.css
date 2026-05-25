@@ -1568,6 +1568,50 @@ body {
   color: var(--bg-dark);
 }
 
+.action-category-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.action-category-btn {
+  padding: 8px 12px;
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.action-category-btn:hover {
+  color: var(--text);
+}
+
+.action-category-btn[data-category="damage"]:hover { border-color: #c66; }
+.action-category-btn[data-category="utility"]:hover { border-color: #999; }
+.action-category-btn[data-category="healing"]:hover { border-color: #6c8; }
+
+.action-category-btn.selected[data-category="damage"] {
+  background: #c66;
+  border-color: #c66;
+  color: var(--bg-dark);
+}
+
+.action-category-btn.selected[data-category="utility"] {
+  background: #aaa;
+  border-color: #aaa;
+  color: var(--bg-dark);
+}
+
+.action-category-btn.selected[data-category="healing"] {
+  background: #6c8;
+  border-color: #6c8;
+  color: var(--bg-dark);
+}
+
 .form-row {
   display: flex;
   gap: 12px;
@@ -1667,6 +1711,22 @@ body {
 .combat-action-card.drag-over {
   border-color: var(--gold);
   background: rgba(212, 175, 55, 0.1);
+}
+
+/* Category-based background colors */
+.combat-action-card.category-damage {
+  background: rgba(220, 90, 90, 0.18);
+  border-color: rgba(220, 90, 90, 0.45);
+}
+
+.combat-action-card.category-utility {
+  background: rgba(170, 170, 170, 0.15);
+  border-color: rgba(170, 170, 170, 0.4);
+}
+
+.combat-action-card.category-healing {
+  background: rgba(100, 200, 130, 0.18);
+  border-color: rgba(100, 200, 130, 0.45);
 }
 
 .combat-action-drag {

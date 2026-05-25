@@ -481,6 +481,7 @@ function updateAllCalculations() {
 
 // ====== COMBAT ACTIONS ======
 let currentActionType = 'weapon';
+let currentActionCategory = 'damage';
 let editingActionIndex = null;
 
 function renderCombatActions(actions) {
@@ -504,7 +505,7 @@ function renderCombatActions(actions) {
   
   actions.forEach((action, index) => {
     const card = document.createElement('div');
-    card.className = 'combat-action-card';
+    card.className = 'combat-action-card category-' + (action.category || 'damage');
     card.draggable = true;
     card.dataset.index = index;
     card.dataset.key = 'combatActions';
@@ -670,6 +671,13 @@ function openCombatActionModal() {
   document.querySelectorAll('.action-type-btn').forEach(btn => {
     btn.classList.toggle('selected', btn.dataset.type === 'weapon');
   });
+  
+  // Reset category to damage
+  currentActionCategory = 'damage';
+  document.querySelectorAll('.action-category-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.category === 'damage');
+  });
+  
   updateCombatActionModalFields();
   
   document.querySelector('#combat-action-modal .modal-header h3').textContent = 'Add Combat Action';
@@ -700,6 +708,13 @@ function editCombatAction(index) {
   document.querySelectorAll('.action-type-btn').forEach(btn => {
     btn.classList.toggle('selected', btn.dataset.type === action.type);
   });
+  
+  // Set category from action (default to damage for backward compat)
+  currentActionCategory = action.category || 'damage';
+  document.querySelectorAll('.action-category-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.category === currentActionCategory);
+  });
+  
   updateCombatActionModalFields();
   
   document.querySelector('#combat-action-modal .modal-header h3').textContent = 'Edit Combat Action';
@@ -805,6 +820,7 @@ function getSpellSaveDC() {
 function saveCombatAction() {
   const action = {
     type: currentActionType,
+    category: currentActionCategory,
     name: document.getElementById('action-name').value,
     castingTime: document.getElementById('action-casting-time').value,
     range: document.getElementById('action-range').value,
@@ -1869,6 +1885,15 @@ document.querySelectorAll('.action-type-btn').forEach(btn => {
     btn.classList.add('selected');
     currentActionType = btn.dataset.type;
     updateCombatActionModalFields();
+  });
+});
+
+// Action category selector
+document.querySelectorAll('.action-category-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.action-category-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentActionCategory = btn.dataset.category;
   });
 });
 
