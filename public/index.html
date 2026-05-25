@@ -604,6 +604,24 @@
     </div>
   </div>
 
+  <!-- Unsaved Changes Modal -->
+  <div class="modal-overlay" id="unsaved-changes-modal">
+    <div class="modal modal-small">
+      <div class="modal-header">
+        <h3>Unsaved Changes</h3>
+        <button class="modal-close" data-modal="unsaved-changes-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>You have unsaved changes. Do you want to save them before leaving?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="unsaved-discard-btn">Discard</button>
+        <button class="btn" data-modal="unsaved-changes-modal">Cancel</button>
+        <button class="btn primary" id="unsaved-save-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Combat Action Modal -->
   <div class="modal-overlay" id="combat-action-modal">
     <div class="modal modal-wide">

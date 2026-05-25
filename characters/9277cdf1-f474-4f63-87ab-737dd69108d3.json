@@ -1,0 +1,157 @@
+{
+  "id": "9277cdf1-f474-4f63-87ab-737dd69108d3",
+  "name": "Steel Defender (Logoff)",
+  "class": "",
+  "subclass": "",
+  "species": "",
+  "background": "",
+  "level": 9,
+  "xp": 0,
+  "armorClass": 15,
+  "shieldEquipped": false,
+  "hpCurrent": 51,
+  "hpTemp": 0,
+  "hpLevel1": 25,
+  "hpPerLevel": 1,
+  "hitDiceSpent": 0,
+  "deathSaves": {
+    "successes": 0,
+    "failures": 0
+  },
+  "speed": "40 ft",
+  "size": "Medium",
+  "heroicInspiration": false,
+  "proficiencyBonus": 4,
+  "abilities": {
+    "strength": 14,
+    "dexterity": 12,
+    "constitution": 14,
+    "intelligence": 4,
+    "wisdom": 10,
+    "charisma": 6
+  },
+  "saveProficiencies": {
+    "strength": false,
+    "dexterity": true,
+    "constitution": true,
+    "intelligence": false,
+    "wisdom": false,
+    "charisma": false
+  },
+  "skillProficiencies": {
+    "athletics": 1,
+    "acrobatics": 0,
+    "sleight-of-hand": 0,
+    "stealth": 0,
+    "arcana": 0,
+    "history": 0,
+    "investigation": 0,
+    "nature": 0,
+    "religion": 0,
+    "animal-handling": 0,
+    "insight": 0,
+    "medicine": 0,
+    "perception": 2,
+    "survival": 0,
+    "deception": 0,
+    "intimidation": 0,
+    "performance": 0,
+    "persuasion": 0
+  },
+  "armorTraining": {
+    "light": false,
+    "medium": false,
+    "heavy": false,
+    "shields": false
+  },
+  "weaponProficiencies": "",
+  "toolProficiencies": "",
+  "combatActions": [
+    {
+      "type": "spell-attack",
+      "name": "Force empowered Rend",
+      "castingTime": "Action",
+      "range": "5ft",
+      "notes": "Melee Weapon Attack: your spell attack modifier to hit, reach 5ft. one target you can see. Hit: 1d8 + PB force damage",
+      "atk": "—",
+      "damage": "1d8 + PB",
+      "concentration": false,
+      "ritual": false,
+      "materials": false,
+      "spellLevel": "cantrip",
+      "prepared": false
+    },
+    {
+      "type": "action",
+      "name": "Repair ",
+      "castingTime": "Action",
+      "range": "",
+      "notes": "Restore 2d8 + PB hit points to itself or to one construct or object within 5 feet of it. Gain all uses back each day.",
+      "uses": 3,
+      "usedUses": [
+        0,
+        1
+      ]
+    },
+    {
+      "type": "action",
+      "name": "Deflect Attack",
+      "castingTime": "Reaction",
+      "range": "5ft",
+      "notes": "The defender imposes disadvantage on the attack roll of one creature it can see that is within 5 feet of it, provided the attack roll is against a creature other than the defender.",
+      "uses": 0,
+      "usedUses": []
+    }
+  ],
+  "classFeatures": [],
+  "speciesTraits": [
+    {
+      "title": "Vigilant",
+      "description": "The defender can't be surprised"
+    }
+  ],
+  "feats": [],
+  "languages": [],
+  "resistances": [
+    "Immune to Charm, Exhaustion, Poisoned",
+    "Immune to Poison dmg"
+  ],
+  "equipment": [],
+  "spellcastingAbility": null,
+  "spellSlots": {
+    "1": {
+      "max": 4,
+      "used": []
+    },
+    "2": {
+      "max": 3,
+      "used": []
+    },
+    "3": {
+      "max": 0,
+      "used": []
+    },
+    "4": {
+      "max": 0,
+      "used": []
+    },
+    "5": {
+      "max": 0,
+      "used": []
+    },
+    "other": {
+      "max": 1,
+      "used": []
+    }
+  },
+  "featureBoxOrder": [
+    "spellcasting-section",
+    "resistances-section",
+    "species-traits-section",
+    "spell-slots-section",
+    "equipment-section",
+    "languages-section",
+    "feats-section",
+    "coins-section"
+  ]
+}

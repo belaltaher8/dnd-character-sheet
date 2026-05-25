@@ -32,6 +32,8 @@ const skillAbilityMap = {
 // State
 let characters = [];
 let currentCharacter = null;
+let savedSnapshot = null;  // JSON snapshot of last saved state for dirty checking
+let pendingNavigation = null;  // Function to invoke after handling unsaved changes
 
 // DOM Elements
 const characterList = document.getElementById('character-list');
@@ -118,10 +120,39 @@ function renderCharacterList() {
 }
 
 function selectCharacter(char) {
+  if (hasUnsavedChanges()) {
+    pendingNavigation = () => doSelectCharacter(char);
+    document.getElementById('unsaved-changes-modal').classList.add('active');
+    return;
+  }
+  doSelectCharacter(char);
+}
+
+function doSelectCharacter(char) {
   currentCharacter = char;
   showCharacterSheet();
   populateForm(char);
   renderCharacterList();
+  updateSavedSnapshot();
+}
+
+function hasUnsavedChanges() {
+  if (!currentCharacter || !characterSheet || characterSheet.classList.contains('hidden')) return false;
+  if (savedSnapshot === null) return false;
+  try {
+    const current = JSON.stringify(getFormData());
+    return current !== savedSnapshot;
+  } catch (e) {
+    return false;
+  }
+}
+
+function updateSavedSnapshot() {
+  try {
+    savedSnapshot = JSON.stringify(getFormData());
+  } catch (e) {
+    savedSnapshot = null;
+  }
 }
 
 function showCharacterSheet() {
@@ -1692,18 +1723,28 @@ function toggleMinimize(sectionId) {
 
 // Event Listeners
 newCharacterBtn.addEventListener('click', () => {
+  if (hasUnsavedChanges()) {
+    pendingNavigation = () => doCreateNewCharacter();
+    document.getElementById('unsaved-changes-modal').classList.add('active');
+    return;
+  }
+  doCreateNewCharacter();
+});
+
+function doCreateNewCharacter() {
   currentCharacter = { id: null, weapons: [], classFeatures: [], speciesTraits: [], feats: [], languages: [], resistances: [] };
   showCharacterSheet();
   populateForm({});
   renderCharacterList();
-});
+  updateSavedSnapshot();
+}
 
 saveBtn.addEventListener('click', async () => {
   const data = getFormData();
   const saved = await saveCharacter(data);
   currentCharacter = saved;
   await fetchCharacters();
-  selectCharacter(saved);
+  doSelectCharacter(saved);
   document.getElementById('save-success-modal').classList.add('active');
 });
 
@@ -1719,9 +1760,51 @@ document.getElementById('confirm-delete-character-btn').addEventListener('click'
   
   await deleteCharacter(currentCharacter.id);
   currentCharacter = null;
+  savedSnapshot = null;
   hideCharacterSheet();
   await fetchCharacters();
   closeModal('delete-character-modal');
+});
+
+// Unsaved Changes Modal handlers
+document.getElementById('unsaved-save-btn').addEventListener('click', async () => {
+  const data = getFormData();
+  const saved = await saveCharacter(data);
+  currentCharacter = saved;
+  await fetchCharacters();
+  updateSavedSnapshot();
+  closeModal('unsaved-changes-modal');
+  if (pendingNavigation) {
+    const nav = pendingNavigation;
+    pendingNavigation = null;
+    nav();
+  }
+});
+
+document.getElementById('unsaved-discard-btn').addEventListener('click', () => {
+  // Mark as clean so navigation proceeds
+  savedSnapshot = null;
+  closeModal('unsaved-changes-modal');
+  if (pendingNavigation) {
+    const nav = pendingNavigation;
+    pendingNavigation = null;
+    nav();
+  }
+});
+
+// Cancel: clicking X or Cancel buttons in unsaved modal clears pending navigation
+document.querySelectorAll('#unsaved-changes-modal [data-modal="unsaved-changes-modal"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    pendingNavigation = null;
+  });
+});
+
+// Warn on page unload (browser tab close/refresh)
+window.addEventListener('beforeunload', (e) => {
+  if (hasUnsavedChanges()) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
 });
 
 duplicateBtn.addEventListener('click', async () => {
@@ -1735,7 +1818,7 @@ duplicateBtn.addEventListener('click', async () => {
   
   const saved = await saveCharacter(data);
   await fetchCharacters();
-  selectCharacter(saved);
+  doSelectCharacter(saved);
 });
 
 // Ability score changes
